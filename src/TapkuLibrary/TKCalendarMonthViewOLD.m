@@ -637,6 +637,14 @@ static UIImage *tileImage;
 
 #pragma mark -
 @implementation TKCalendarMonthView
+@synthesize sunday;
+@synthesize tileBox;
+@synthesize currentTile;
+@synthesize shadow;
+@synthesize oldTile;
+@synthesize sizeDelegate;
+@synthesize delegate;
+@synthesize dataSource;
 
 + (void) initialize{
     if (self == [TKCalendarMonthView class]){
@@ -733,8 +741,8 @@ static UIImage *tileImage;
 	self = [self initWithSundayAsFirst:YES timeZone:timeZone];
 	return self;
 }
-- (id) initWithSundayAsFirst:(BOOL)sunday{
-	self = [self initWithSundayAsFirst:sunday timeZone:[NSTimeZone defaultTimeZone]];
+- (id) initWithSundayAsFirst:(BOOL)sun{
+	self = [self initWithSundayAsFirst:sun timeZone:[NSTimeZone defaultTimeZone]];
 	return self;
 }
 - (id) init{

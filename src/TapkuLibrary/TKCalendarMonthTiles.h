@@ -60,15 +60,15 @@
 @property (nonatomic, strong) NSMutableArray *accessibleElements;
 @property (nonatomic, strong) NSTimeZone *timeZone;
 
-- (id) initWithFrame:(CGRect)frame month:(NSDate *) date marks:(NSArray *) markArray startOnSunday:(BOOL) sunday;
+- (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray *)markArray startOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone;
 - (void) setTarget:(id)target action:(SEL)action;
 
 - (BOOL) selectDay:(int)day;
-- (NSDate*) dateSelected;
+- (NSDate *) dateSelected;
 
-+ (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday;
-+ (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone;
++ (NSArray *) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday;
++ (NSArray *) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone;
 
-+ (int) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone;
++ (NSUInteger) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone;
 
 @end

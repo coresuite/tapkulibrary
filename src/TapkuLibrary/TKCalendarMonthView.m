@@ -54,11 +54,11 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 @synthesize header;
 @synthesize timeZone;
 
-+ (int) rowsForMonth:(NSDate *) date {
++ (NSUInteger) rowsForMonth:(NSDate *) date {
     return [self rowsForMonth:date timeZone:[NSTimeZone defaultTimeZone]];
 }
 
-+ (int) rowsForMonth:(NSDate *) date timeZone:(NSTimeZone *) timeZone{
++ (NSUInteger) rowsForMonth:(NSDate *) date timeZone:(NSTimeZone *) timeZone {
     return [TKCalendarMonthTiles rowsForMonth:date startDayOnSunday:YES timeZone:timeZone];
 }
 
@@ -91,14 +91,18 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 	return [self initWithFrame:CGRectZero sundayAsFirst:[TKCalendarMonthView sundayShouldBeFirst]];
 }
 
-- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)timeZone {
+- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s {
+    return [self initWithFrame:aFrame sundayAsFirst:s timeZone:[NSTimeZone defaultTimeZone]];
+}
+
+- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz {
     if ((self = [super initWithFrame:aFrame])) {
-        self.timeZone = timeZone;
+        self.timeZone = tz;
         sunday = s;
         
         NSDate *month = [self firstOfMonthFromDate:[NSDate date]];
         
-        currentTile = [[TKCalendarMonthTiles alloc] initWithFrame:CGRectZero month:month marks:nil startOnSunday:sunday];
+        currentTile = [[TKCalendarMonthTiles alloc] initWithFrame:CGRectZero month:month marks:nil startOnSunday:sunday timeZone:tz];
         [currentTile setTarget:self action:@selector(tile:)];
         
         [self addSubview:self.header];
@@ -108,8 +112,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
         
         self.backgroundColor = [UIColor grayColor];
         
-        NSDate *date = [NSDate date];
-        self.header.titleView.text = [month monthYearStringWithTimeZone:timeZone];
+        self.header.titleView.text = [month monthYearStringWithTimeZone:tz];
         
         // setup actions
         [self.header.rightArrow addTarget:self action:@selector(changeMonth:) forControlEvents:UIControlEventTouchUpInside];
@@ -152,7 +155,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
     
     // TODO correct frame
-    TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:nextMonth marks:ar startOnSunday:sunday];
+    TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:nextMonth marks:ar startOnSunday:sunday timeZone:self.timeZone];
 	[newTile setTarget:self action:@selector(tile:)];
 	
 	int overlap =  0;
@@ -267,7 +270,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 		NSArray *data = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
         
         // TODO correct frame
-        TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:month marks:data startOnSunday:sunday];
+        TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:month marks:data startOnSunday:sunday timeZone:self.timeZone];
 		[newTile setTarget:self action:@selector(tile:)];
 		[currentTile removeFromSuperview];
 		currentTile = newTile;
@@ -297,7 +300,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:[currentTile monthDate] startOnSunday:sunday timeZone:self.timeZone];
 	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
 	
-    TKCalendarMonthTiles *refresh = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:[currentTile monthDate] marks:ar startOnSunday:sunday];
+    TKCalendarMonthTiles *refresh = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:[currentTile monthDate] marks:ar startOnSunday:sunday timeZone:self.timeZone];
 	[refresh setTarget:self action:@selector(tile:)];
 	
 	[self.tileBox addSubview:refresh];

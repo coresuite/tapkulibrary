@@ -202,7 +202,7 @@
     return rows;
 }
 
-- (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray*)markArray startDayOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone
+- (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray*)markArray startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone
 {
     if ((self = [super initWithFrame:frame])) {
         gradientColor = [UIColor colorWithPatternImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient.png")]];

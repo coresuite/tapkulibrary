@@ -54,6 +54,7 @@
 
 - (id) initWithSundayAsFirst:(BOOL)sunday; // it sunday regardless right now...
 - (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s;
+- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz;
 
 - (NSDate*) dateSelected;
 - (NSDate*) monthDate;
@@ -62,7 +63,8 @@
 
 - (CGFloat) maximumHeight;
 
-+ (int) rowsForMonth:(NSDate *) date;
++ (NSUInteger) rowsForMonth:(NSDate *) date;
++ (NSUInteger) rowsForMonth:(NSDate *) date timeZone:(NSTimeZone *) timeZone;
 @end
 
 
