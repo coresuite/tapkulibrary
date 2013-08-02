@@ -30,8 +30,10 @@
  */
 
 #import "TKCalendarMonthView.h"
-
 #import "TKCalendarMonthTiles.h"
+#import "NSDate+TKCategory.h"
+#import "NSDate+CalendarGrid.h"
+#import "TKGlobal.h"
 
 #define kCalendImagesPath @"TapkuLibrary.bundle/Images/calendar/"
 
@@ -47,55 +49,17 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 
 @end
 
-
-@implementation TKCalendarMonthView (privateMeth)
-
-- (NSDate *) firstOfMonthFromDate:(NSDate*)date {
-	TKDateInformation info = [date dateInformation];
-	info.day = 1;
-	info.minute = 0;
-	info.second = 0;
-	info.hour = 0;
-	return [NSDate dateFromDateInformation:info];
-}
-
-- (NSDate*) nextMonthFromDate:(NSDate*)date {	
-	TKDateInformation info = [date dateInformation];
-	info.month++;
-	if(info.month>12){
-		info.month = 1;
-		info.year++;
-	}
-	info.minute = 0;
-	info.second = 0;
-	info.hour = 0;
-	
-	return [NSDate dateFromDateInformation:info];
-	
-}
-
-- (NSDate*) previousMonthFromDate:(NSDate*)date {
-	TKDateInformation info = [date dateInformation];
-	info.month--;
-	if(info.month<1){
-		info.month = 12;
-		info.year--;
-	}
-	
-	info.minute = 0;
-	info.second = 0;
-	info.hour = 0;
-	return [NSDate dateFromDateInformation:info];
-}
-
-@end
-
 @implementation TKCalendarMonthView
 @synthesize delegate, dataSource, sizeDelegate;
 @synthesize header;
+@synthesize timeZone;
 
 + (int) rowsForMonth:(NSDate *) date {
-    return [TKCalendarMonthTiles rowsForMonth:date startDayOnSunday:YES];
+    return [self rowsForMonth:date timeZone:[NSTimeZone defaultTimeZone]];
+}
+
++ (int) rowsForMonth:(NSDate *) date timeZone:(NSTimeZone *) timeZone{
+    return [TKCalendarMonthTiles rowsForMonth:date startDayOnSunday:YES timeZone:timeZone];
 }
 
 - (CGFloat) maximumHeight {
@@ -127,8 +91,9 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 	return [self initWithFrame:CGRectZero sundayAsFirst:[TKCalendarMonthView sundayShouldBeFirst]];
 }
 
-- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s {
+- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)timeZone {
     if ((self = [super initWithFrame:aFrame])) {
+        self.timeZone = timeZone;
         sunday = s;
         
         NSDate *month = [self firstOfMonthFromDate:[NSDate date]];
@@ -144,7 +109,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
         self.backgroundColor = [UIColor grayColor];
         
         NSDate *date = [NSDate date];
-        self.header.titleView.text = [NSString stringWithFormat:@"%@ %@",[date month],[date year]];
+        self.header.titleView.text = [month monthYearStringWithTimeZone:timeZone];
         
         // setup actions
         [self.header.rightArrow addTarget:self action:@selector(changeMonth:) forControlEvents:UIControlEventTouchUpInside];
@@ -156,9 +121,12 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
             startDateOffset = 1;
         }
         NSDate *startingDate = [NSDate dateWithTimeIntervalSince1970:3*24*60*60 + startDateOffset * 24*60*60 + 2];
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"E"];
         for (NSInteger i = 0; i < 7; ++i) {
             // name of a day of the week of 0 date is Thu
-            [ar addObject:[startingDate day]];
+            NSString *str = [dateFormatter stringFromDate:startingDate];
+            [ar addObject:str];
             startingDate = [startingDate dateByAddingTimeInterval:24*60*60 + 1];
         }
         int i = 0;
@@ -174,23 +142,23 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 }
 
 - (void) changeMonthAnimation:(UIView*)sender {
-	
 	BOOL isNext = (sender.tag == 1);
-	NSDate *nextMonth = isNext ? [self nextMonthFromDate:currentTile.monthDate] : [self previousMonthFromDate:currentTile.monthDate];
+	NSDate *nextMonth = isNext ? [currentTile.monthDate nextMonthWithTimeZone:self.timeZone] : [currentTile.monthDate previousMonthWithTimeZone:self.timeZone];
 	
-	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:nextMonth startOnSunday:sunday];
+    NSDateComponents *nextInfo = [nextMonth dateComponentsWithTimeZone:self.timeZone];
+	NSDate *localNextMonth = [NSDate dateWithDateComponents:nextInfo];
+    
+	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:nextMonth startOnSunday:sunday timeZone:self.timeZone];
 	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
     
     // TODO correct frame
     TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:nextMonth marks:ar startOnSunday:sunday];
 	[newTile setTarget:self action:@selector(tile:)];
 	
-	
 	int overlap =  0;
-	
 	if(isNext){
 		overlap = [newTile.monthDate isEqualToDate:[dates objectAtIndex:0]] ? 0 : fCalendarHeaderHeight;
-	}else{
+	} else {
 		overlap = [currentTile.monthDate compare:[dates lastObject]] !=  NSOrderedDescending ? fCalendarHeaderHeight : 0;
 	}
 	
@@ -231,17 +199,37 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 	
 	oldTile = currentTile;
 	currentTile = newTile;
-	self.header.titleView.text = [NSString stringWithFormat:@"%@ %@",[nextMonth month],[nextMonth year]];
+	self.header.titleView.text = [localNextMonth monthYearStringWithTimeZone:self.timeZone];
     [self.header setNeedsLayout];
 }
 
-- (void) changeMonth:(UIButton *)sender{
+- (NSDate*) _dateForMonthChange:(UIView*)sender {
+	BOOL isNext = (sender.tag == 1);
+	NSDate *nextMonth = isNext ? [currentTile.monthDate nextMonthWithTimeZone:self.timeZone] : [currentTile.monthDate previousMonthWithTimeZone:self.timeZone];
 	
-	[self changeMonthAnimation:sender];
-	if([delegate respondsToSelector:@selector(calendarMonthView:monthDidChange:)])
-		[delegate calendarMonthView:self monthDidChange:currentTile.monthDate];
-
+	NSDateComponents *nextInfo = [nextMonth dateComponentsWithTimeZone:self.timeZone];
+	NSDate *localNextMonth = [NSDate dateWithDateComponents:nextInfo];
+	
+	return localNextMonth;
 }
+
+- (void) changeMonth:(UIButton *)sender{
+    NSDate *newDate = [self _dateForMonthChange:sender];
+	if ([self.delegate respondsToSelector:@selector(calendarMonthView:monthShouldChange:animated:)] &&
+        ![self.delegate calendarMonthView:self monthShouldChange:newDate animated:YES]) {
+        return;
+    }
+	if ([self.delegate respondsToSelector:@selector(calendarMonthView:monthWillChange:animated:)]) {
+        [self.delegate calendarMonthView:self monthWillChange:newDate animated:YES];
+    }
+    
+	[self changeMonthAnimation:sender];
+    
+    if([self.delegate respondsToSelector:@selector(calendarMonthView:monthDidChange:animated:)]) {
+        [self.delegate calendarMonthView:self monthDidChange:currentTile.monthDate animated:YES];
+    }
+}
+
 - (void) animationEnded {
 	self.userInteractionEnabled = YES;
 	oldTile = nil;
@@ -255,17 +243,27 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 	return [currentTile monthDate];
 }
 
-- (void) selectDate:(NSDate*)date{
-	TKDateInformation info = [date dateInformation];
-	NSDate *month = [self firstOfMonthFromDate:date];
+- (BOOL) selectDate:(NSDate*)date {
+    if(date == nil) date = [NSDate date];
+    
+    NSDateComponents *info = [date dateComponentsWithTimeZone:self.timeZone];
+	NSDate *month = [date firstOfMonthWithTimeZone:self.timeZone];
 	
+    BOOL ret = NO;
 	if([month isEqualToDate:[currentTile monthDate]]){
-		[currentTile selectDay:info.day];
-		return;
+		ret = [currentTile selectDay:info.day];
 	} else {
+        if ([self.delegate respondsToSelector:@selector(calendarMonthView:monthShouldChange:animated:)] &&
+            ![self.delegate calendarMonthView:self monthShouldChange:month animated:YES])
+        {
+            return NO;
+        }
 		
-		NSDate *month = [self firstOfMonthFromDate:date];
-		NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:month startOnSunday:sunday];
+		if ([self.delegate respondsToSelector:@selector(calendarMonthView:monthWillChange:animated:)] ) {
+            [self.delegate calendarMonthView:self monthWillChange:month animated:YES];
+        }
+        
+		NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:month startOnSunday:sunday timeZone:self.timeZone];
 		NSArray *data = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
         
         // TODO correct frame
@@ -281,13 +279,22 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 		self.shadow.frame = CGRectMake(0, self.frame.size.height-self.shadow.frame.size.height+outsideShadowHeight, self.shadow.frame.size.width, self.shadow.frame.size.height);
 
 	
-		self.header.titleView.text = [NSString stringWithFormat:@"%@ %@",[month month],[month year]];
+		self.header.titleView.text = [month monthYearStringWithTimeZone:self.timeZone];
 		
-		[currentTile selectDay:info.day];
+		ret = [currentTile selectDay:info.day];
+        
+        if([self.delegate respondsToSelector:@selector(calendarMonthView:monthDidChange:animated:)]) {
+            [self.delegate calendarMonthView:self monthDidChange:date animated:NO];
+        }
 	}
+    if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)]) {
+        [self.delegate calendarMonthView:self didSelectDate:[self dateSelected]];
+    }
+    
+    return ret;
 }
 - (void) reload {
-	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:[currentTile monthDate] startOnSunday:sunday];
+	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:[currentTile monthDate] startOnSunday:sunday timeZone:self.timeZone];
 	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
 	
     TKCalendarMonthTiles *refresh = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:[currentTile monthDate] marks:ar startOnSunday:sunday];
@@ -299,37 +306,38 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 }
 
 - (void) tile:(NSArray*)ar{
-	
 	if([ar count] < 2){
-		
-		NSDate *d = [currentTile monthDate];
-		TKDateInformation info = [d dateInformation];
-		info.day = [[ar objectAtIndex:0] intValue];
-		
-		NSDate *select = [NSDate dateFromDateInformation:info];
-		if([delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)])
-			[delegate calendarMonthView:self didSelectDate:select];
-	}else{
-		
-		int direction = [[ar lastObject] intValue];
+        if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)]) {
+            [self.delegate calendarMonthView:self didSelectDate:[self dateSelected]];
+        }
+	} else {
+		NSInteger direction = [[ar lastObject] intValue];
 		UIButton *b = direction > 1 ? self.header.rightArrow : self.header.leftArrow;
 		
+        NSDate* newMonth = [self _dateForMonthChange:b];
+		if ([self.delegate respondsToSelector:@selector(calendarMonthView:monthShouldChange:animated:)] &&
+            ![self.delegate calendarMonthView:self monthShouldChange:newMonth animated:YES])
+        {
+            return;
+        }
 		
+		if ([self.delegate respondsToSelector:@selector(calendarMonthView:monthWillChange:animated:)]) {
+            [self.delegate calendarMonthView:self monthWillChange:newMonth animated:YES];
+        }
+        
 		[self changeMonthAnimation:b];
 		
-		int day = [[ar objectAtIndex:0] intValue];
-		//[currentTile selectDay:day];
-	
-		// thanks rafael
-		TKDateInformation info = [[currentTile monthDate] dateInformation];
+		NSInteger day = [[ar objectAtIndex:0] intValue];
+        NSDateComponents *info = [[currentTile monthDate] dateComponentsWithTimeZone:self.timeZone];
 		info.day = day;
-		NSDate *dateForMonth = [NSDate  dateFromDateInformation:info]; 
+        NSDate *dateForMonth = [NSDate dateWithDateComponents:info];
+		if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)]) {
+            [self.delegate calendarMonthView:self didSelectDate:dateForMonth];
+        }
+		if([self.delegate respondsToSelector:@selector(calendarMonthView:monthDidChange:animated:)]) {
+            [self.delegate calendarMonthView:self monthDidChange:dateForMonth animated:YES];
+        }
 		[currentTile selectDay:day];
-		
-		if([delegate respondsToSelector:@selector(calendarMonthView:monthDidChange:)])
-			[delegate calendarMonthView:self monthDidChange:dateForMonth];
-
-		
 	}
 	
 }
@@ -366,7 +374,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 
 - (UIImageView *) shadow {
 	if(shadow==nil){
-		shadow = [[UIImageView alloc] initWithImage:[UIImage imageFromPath:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Calendar Shadow.png")]];
+		shadow = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Shadow.png")]];
 	}
 	return shadow;
 }

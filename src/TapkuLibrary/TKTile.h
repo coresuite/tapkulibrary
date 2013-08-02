@@ -24,7 +24,7 @@ typedef enum {
 @property (nonatomic, readonly) UILabel *dot;
 @property (nonatomic) CGSize shadowOffset;
 
-+ (void) drawTileInRect:(CGRect)r day:(int)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2;
++ (void) drawTileInRect:(CGRect)r day:(int)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2  context:(CGContextRef)context;
 
 + (NSString *) stringFromDayNumber:(int) day;
 

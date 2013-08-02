@@ -7,7 +7,7 @@
 //
 
 #import "TKCalendarMonthViewHeader.h"
-
+#import "TKGlobal.h"
 
 @implementation TKCalendarMonthViewHeader
 @synthesize leftArrow;

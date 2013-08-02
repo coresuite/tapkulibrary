@@ -31,6 +31,8 @@
 
 #import "TKCalendarMonthTiles.h"
 #import "TKGlobal.h"
+#import "NSDate+CalendarGrid.h"
+#import "NSDate+TKCategory.h"
 #import <objc/message.h>
 
 @interface NSArray(TKCalendarExtensions)
@@ -125,6 +127,10 @@
     return CGRectMake(x, y, self.tileWidth, self.tileHeight);
 }
 
++ (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday {
+    return [self rangeOfDatesInMonthGrid:date startOnSunday:sunday timeZone:[NSTimeZone defaultTimeZone]];
+}
+
 + (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone {
     NSDate *firstDate, *lastDate;
 	NSDateComponents *info = [date dateComponentsWithTimeZone:timeZone];
@@ -188,9 +194,7 @@
 	return @[firstDate,lastDate];
 }
 
-+ (NSUInteger) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone {
-    NSDateComponents *dateInfo = [date dateComponentsWithTimeZone:timeZone];
-    
++ (NSUInteger) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone {    
     NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:date startOnSunday:sunday timeZone:timeZone];
     
     NSUInteger numberOfDaysBetween = [dates[0] daysBetweenDate:[dates lastObject]];
@@ -211,10 +215,10 @@
         monthDate = date;
         startOnSunday = sunday;
 		
-        NSDateComponents *dateInfo = [_monthDate dateComponentsWithTimeZone:self.timeZone];
+        NSDateComponents *dateInfo = [self.monthDate dateComponentsWithTimeZone:self.timeZone];
         firstWeekday = dateInfo.weekday;
-        NSDate *prev = [_monthDate previousMonthWithTimeZone:self.timeZone];
-        daysInMonth = [[_monthDate nextMonthWithTimeZone:self.timeZone] daysBetweenDate:_monthDate];
+        NSDate *prev = [self.monthDate previousMonthWithTimeZone:self.timeZone];
+        daysInMonth = [[self.monthDate nextMonthWithTimeZone:self.timeZone] daysBetweenDate:self.monthDate];
         
         NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:date startOnSunday:sunday timeZone:self.timeZone];
         self.datesArray = dates;
@@ -222,7 +226,7 @@
         NSDateComponents *todayInfo = [[NSDate date] dateComponentsWithTimeZone:self.timeZone];
         today = dateInfo.month == todayInfo.month && dateInfo.year == todayInfo.year ? todayInfo.day : -5;
         
-        NSInteger preDayCnt = [prev daysBetweenDate:_monthDate];
+        NSInteger preDayCnt = [prev daysBetweenDate:self.monthDate];
         if(firstWeekday>1 && sunday){
             firstOfPrev = preDayCnt - firstWeekday+2;
             lastOfPrev = preDayCnt;
@@ -364,10 +368,12 @@
 - (NSDate*) dateSelected {
 	if(selectedDay < 1 || selectedPortion != 1) return nil;
 	
-    NSDateComponents *info = [_monthDate dateComponentsWithTimeZone:self.timeZone];
+	NSDateComponents *info = [monthDate dateComponentsWithTimeZone:self.timeZone];
 	info.hour = 0; info.minute = 0; info.second = 0;
 	info.day = selectedDay;
 	NSDate *d = [NSDate dateWithDateComponents:info];
+
+	return d;
 }
 
 - (void) reactToTouch:(UITouch*)touch down:(BOOL)down {

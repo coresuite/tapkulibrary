@@ -46,7 +46,7 @@
 	id <TKCalendarMonthViewDataSource> __weak dataSource;
 	id <TKCalendarMonthViewSizeDelegate> __weak sizeDelegate;
 }
-
+@property (nonatomic, strong) NSTimeZone *timeZone;
 @property (nonatomic)   TKCalendarMonthViewHeader *header;
 @property (nonatomic,weak) id <TKCalendarMonthViewDelegate> delegate;
 @property (nonatomic,weak) id <TKCalendarMonthViewDataSource> dataSource;
@@ -57,7 +57,7 @@
 
 - (NSDate*) dateSelected;
 - (NSDate*) monthDate;
-- (void) selectDate:(NSDate*)date;
+- (BOOL) selectDate:(NSDate*)date;
 - (void) reload;
 
 - (CGFloat) maximumHeight;
@@ -69,8 +69,34 @@
 @protocol TKCalendarMonthViewDelegate <NSObject>
 
 @optional
-- (void) calendarMonthView:(UIView *)monthView didSelectDate:(NSDate*)d;
-- (void) calendarMonthView:(UIView *)monthView monthDidChange:(NSDate*)d;
+/** The highlighed date changed.
+ @param monthView The calendar month view.
+ @param date The highlighted date.
+ */
+- (void) calendarMonthView:(TKCalendarMonthView*)monthView didSelectDate:(NSDate*)date;
+
+
+/** The calendar should change the current month to grid shown.
+ @param monthView The calendar month view.
+ @param month The month date.
+ @param animated Animation flag
+ @return YES if the month should change. NO otherwise
+ */
+- (BOOL) calendarMonthView:(TKCalendarMonthView*)monthView monthShouldChange:(NSDate*)month animated:(BOOL)animated;
+
+/** The calendar will change the current month to grid shown.
+ @param monthView The calendar month view.
+ @param month The month date.
+ @param animated Animation flag
+ */
+- (void) calendarMonthView:(TKCalendarMonthView*)monthView monthWillChange:(NSDate*)month animated:(BOOL)animated;
+
+/** The calendar did change the current month to grid shown.
+ @param monthView The calendar month view.
+ @param month The month date.
+ @param animated Animation flag
+ */
+- (void) calendarMonthView:(TKCalendarMonthView*)monthView monthDidChange:(NSDate*)month animated:(BOOL)animated;
 
 @end
 
@@ -81,5 +107,12 @@
 @end
 
 @protocol TKCalendarMonthViewSizeDelegate <NSObject>
+
+/** A data source that will correspond to marks for the calendar month grid for a particular month.
+ @param monthView The calendar month grid.
+ @param startDate The first date shown by the calendar month grid.
+ @param lastDate The last date shown by the calendar month grid.
+ @return Returns an array of NSNumber objects corresponding the number of days specified in the start and last day parameters. Each NSNumber variable will give a BOOL value that will be used to display a dot under the day.
+ */
 - (void) calendarMonthView:(UIView *) monthView willAnimateToFrame:(CGRect) rect animationDuration:(NSTimeInterval) interval;
 @end

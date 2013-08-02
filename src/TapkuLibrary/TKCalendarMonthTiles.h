@@ -63,11 +63,12 @@
 - (id) initWithFrame:(CGRect)frame month:(NSDate *) date marks:(NSArray *) markArray startOnSunday:(BOOL) sunday;
 - (void) setTarget:(id)target action:(SEL)action;
 
-- (void) selectDay:(int)day;
+- (BOOL) selectDay:(int)day;
 - (NSDate*) dateSelected;
 
 + (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday;
++ (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone;
 
-+ (int) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday;
++ (int) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone;
 
 @end
