@@ -42,18 +42,18 @@
     self = [super initWithFrame:frame];
     if (self) {
 		// bg
-		backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageFromPath:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Grid Top Bar.png")]];
+		backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Grid Top Bar.png")]];
 		[self addSubview:backgroundView];
 		
 		// arrows
 		rightArrow = [UIButton buttonWithType:UIButtonTypeCustom];
 		rightArrow.tag = 1;
-		[rightArrow setImage:[UIImage imageNamedTK:@"TapkuLibrary.bundle/Images/calendar/Month Calendar Right Arrow"] forState:0];
+		[rightArrow setImage:[UIImage imageWithContentsOfFile:@"calendar/Month Calendar Right Arrow"] forState:0];
 		[self addSubview:rightArrow];
 		
 		leftArrow = [UIButton buttonWithType:UIButtonTypeCustom];
 		leftArrow.tag = 0;
-		[leftArrow setImage:[UIImage imageNamedTK:@"TapkuLibrary.bundle/Images/calendar/Month Calendar Left Arrow"] forState:0];
+		[leftArrow setImage:[UIImage imageWithContentsOfFile:@"calendar/Month Calendar Left Arrow"] forState:0];
 		[self addSubview:leftArrow];
 		
 		// title

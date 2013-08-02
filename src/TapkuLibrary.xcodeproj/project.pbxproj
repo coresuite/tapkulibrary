@@ -339,10 +339,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3B859EAD134C73D600661088 /* UIKit.framework in Frameworks */,
-				3B859EAE134C73DE00661088 /* Foundation.framework in Frameworks */,
-				3B859EB0134C73EF00661088 /* QuartzCore.framework in Frameworks */,
-				3B859EC6134C74D800661088 /* SenTestingKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,7 +360,6 @@
 			isa = PBXGroup;
 			children = (
 				D2AAC07E0554694100DB518D /* libTapkuLibrary.a */,
-				3B45DDF1134C736600D24C1A /* LogicTests.octest */,
 				21B22F6F17A1728400460C51 /* libMonthCalendar.a */,
 			);
 			name = Products;
@@ -795,10 +790,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B45DDF5134C736600D24C1A /* Build configuration list for PBXNativeTarget "LogicTests" */;
 			buildPhases = (
-				3B45DDEC134C736600D24C1A /* Resources */,
 				3B45DDED134C736600D24C1A /* Sources */,
 				3B45DDEE134C736600D24C1A /* Frameworks */,
-				3B45DDEF134C736600D24C1A /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -806,7 +799,6 @@
 			);
 			name = LogicTests;
 			productName = LogicTests;
-			productReference = 3B45DDF1134C736600D24C1A /* LogicTests.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
 		D2AAC07D0554694100DB518D /* TapkuLibrary */ = {
@@ -874,16 +866,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20DE9F4C168FAC6000655BF8 /* NSObject+TKCategory.m in Sources */,
-				3B4438C115B74C920069AAA3 /* UIView+TKCategory.m in Sources */,
-				3B859F02134C76C600661088 /* NSArray+TKCategory.m in Sources */,
-				3B859F03134C76C700661088 /* NSDate+TKCategory.m in Sources */,
-				3B859F08134C76D500661088 /* NSString+TKCategory.m in Sources */,
-				3B89162B134D93D000BD2B31 /* FoundationTests.m in Sources */,
-				3B4438A815B73C690069AAA3 /* NSStringTests.m in Sources */,
-				3B4438BA15B74A990069AAA3 /* UIViewTests.m in Sources */,
-				3BDE805E15BE3B210010738D /* NSArrayTests.m in Sources */,
-				20DE9F45168F93E400655BF8 /* DataTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

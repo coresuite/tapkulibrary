@@ -7,6 +7,7 @@
 //
 
 #import "TKTile.h"
+#import "TKGlobal.h"
 
 // iPhone values
 //#define dotFontSize 18.0
@@ -88,23 +89,22 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 	dot.frame = rectForDay;
 }
 
++ (NSString *) stringFromDayNumber:(int) day {
+    static NSNumberFormatter *formatter = nil;
+    if (formatter == nil) {
+        formatter = [[NSNumberFormatter alloc] init];
+    }
+    return [formatter stringFromNumber:@(day)];
+}
 
-+ (void) drawTileInRect:(CGRect)tileRect day:(int)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 {
-	NSString *str = [NSString stringWithFormat:@"%d",day];
++ (void) drawTileInRect:(CGRect)tileRect day:(int)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 context:(CGContextRef)context {
+	NSString *str = [TKTile stringFromDayNumber:day];
 	
 	CGRect r = [TKTile rectForLabelForTileRect:tileRect labelFont:f1];
 	
-	// debugging code
-/* 	
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	[[UIColor redColor] set];
-	CGContextStrokeRect(context, tileRect);
-	
-	[[UIColor yellowColor] set];
-	CGContextFillRect(context, r);
-	
-	[[UIColor blueColor] set];
-*/
+    //TODO: new line!
+    CGContextSetPatternPhase(context, CGSizeMake(r.origin.x, r.origin.y - 2));
+    
 	[str drawInRect: r
 		   withFont: f1
 	  lineBreakMode: UILineBreakModeWordWrap 
@@ -121,15 +121,15 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 }
 
 + (UIImage *) imageForTileType:(TKTileType) tileType {
-	UIImage *imageToReturn = [UIImage imageFromPath:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Calendar Date Tile.png")]; // not selected
+	UIImage *imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile.png")]; // not selected
 	if (tileType == TKTileTypeSelected) {
-		imageToReturn = [UIImage imageFromPath:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Calendar Date Tile Selected.png")];
+		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile Selected.png")];
 	} else if (tileType == TKTileTypeSelectedToday) {
-		imageToReturn = [UIImage imageFromPath:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Calendar Today Selected Tile.png")];
+		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Today Selected Tile.png")];
 	} else if (tileType == TKTileTypeDarken) {
-		imageToReturn = [UIImage imageFromPath:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Calendar Date Tile Gray.png")];
+		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile Gray.png")];
 	} else if(tileType == TKTileTypeToday) {
-		imageToReturn = [UIImage imageFromPath:TKBUNDLE(@"TapkuLibrary.bundle/Images/calendar/Month Calendar Today Tile.png")];
+		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Today Tile.png")];
 	}
 
 

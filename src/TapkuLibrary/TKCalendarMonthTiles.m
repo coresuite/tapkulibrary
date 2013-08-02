@@ -30,19 +30,86 @@
  */
 
 #import "TKCalendarMonthTiles.h"
+#import "TKGlobal.h"
 #import <objc/message.h>
+
+@interface NSArray(TKCalendarExtensions)
+- (BOOL) isMarkAtIndex:(NSUInteger) index;
+@end
+
+@implementation NSArray(TKCalendarExtensions)
+
+- (BOOL) isMarkAtIndex:(NSUInteger) index {
+    BOOL mark = NO;
+    NSUInteger count = [self count];
+    if (count > 0 && index < count) {
+        mark = [self[index] boolValue];
+    }
+    return mark;
+}
+
+@end
 
 
 @interface TKCalendarMonthTiles (private)
-
 @property (readonly) TKTile *selectedImageView;
-//@property (readonly) UILabel *currentDay;
-//@property (readonly) UILabel *dot;
 @end
 
-@implementation TKCalendarMonthTiles
+@implementation TKCalendarMonthTiles {
+    UIColor *gradientColor;
+    UIColor *grayGradientColor;
+}
 @synthesize monthDate;
 @synthesize visibleDayRows;
+
+#pragma mark Accessibility Container methods
+
+- (BOOL) isAccessibilityElement{
+    return NO;
+}
+
+- (NSArray *) accessibleElements{
+    if (_accessibleElements!=nil) return _accessibleElements;
+    
+    _accessibleElements = [[NSMutableArray alloc] init];
+	
+	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+	[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+	[formatter setDateStyle:NSDateFormatterFullStyle];
+	[formatter setTimeStyle:NSDateFormatterNoStyle];
+	[formatter setTimeZone:self.timeZone];
+	
+	NSDate *firstDate = (self.datesArray)[0];
+	
+	for(NSInteger i=0; i < marks.count; i++){
+		UIAccessibilityElement *element = [[UIAccessibilityElement alloc] initWithAccessibilityContainer:self];
+		
+		NSDate *day = [NSDate dateWithTimeIntervalSinceReferenceDate:[firstDate timeIntervalSinceReferenceDate]+(24*60*60*i)+5];
+		element.accessibilityLabel = [formatter stringForObjectValue:day];
+		
+		CGRect r = [self convertRect:[self rectForCellAtIndex:i tileWidth:self.tileWidth tileHeight:[self tileHeight]]
+                              toView:self.window];
+		r.origin.y -= 6;
+		
+		element.accessibilityFrame = r;
+		element.accessibilityTraits = UIAccessibilityTraitButton;
+		element.accessibilityValue = [(marks)[i] boolValue] ? @"Has Events" : @"No Events";
+		[_accessibleElements addObject:element];
+	}
+	
+    return _accessibleElements;
+}
+- (NSInteger) accessibilityElementCount{
+    return [self accessibleElements].count;
+}
+- (id) accessibilityElementAtIndex:(NSInteger)index{
+    return [self accessibleElements][index];
+}
+- (NSInteger) indexOfAccessibilityElement:(id)element{
+    return [[self accessibleElements] indexOfObject:element];
+}
+
+#pragma mark - Measurements
 
 - (CGFloat) tileWidth {
     return CGRectGetWidth(self.bounds) / 7.0f;
@@ -58,159 +125,123 @@
     return CGRectMake(x, y, self.tileWidth, self.tileHeight);
 }
 
-+ (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday{
++ (NSArray*) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone {
+    NSDate *firstDate, *lastDate;
+	NSDateComponents *info = [date dateComponentsWithTimeZone:timeZone];
 	
-	NSDate *firstDate, *lastDate;
+	info.day = 1; info.hour = info.minute = info.second = 0;
 	
-	TKDateInformation info = [date dateInformation];
-	info.day = 1;
-	NSDate *d = [NSDate dateFromDateInformation:info];
-	info = [d dateInformation];
+	NSDate *currentMonth = [NSDate dateWithDateComponents:info];
+	info = [currentMonth dateComponentsWithTimeZone:timeZone];
 	
-	if((sunday && info.weekday>1) || (!sunday && info.weekday!=2)){
-		TKDateInformation info2 = info;
+	NSDate *previousMonth = [currentMonth previousMonthWithTimeZone:timeZone];
+	NSDate *nextMonth = [currentMonth nextMonthWithTimeZone:timeZone];
+	
+	if(info.weekday > 1 && sunday){
+		NSDateComponents *info2 = [previousMonth dateComponentsWithTimeZone:timeZone];
 		
-
-		info2.month--;
-		if(info2.month<1) { info2.month = 12; info2.year--; }
-		NSDate *previousMonth = [NSDate dateFromDateInformation:info2];
-		int preDayCnt = [previousMonth daysInMonth];		
-		info2.day = preDayCnt - info.weekday;
-		if (sunday) {
-			info2.day += 2;
+		NSInteger preDayCnt = [previousMonth daysBetweenDate:currentMonth];
+		info2.day = preDayCnt - info.weekday + 2;
+		firstDate = [NSDate dateWithDateComponents:info2];
+	} else if(!sunday && info.weekday != 2){
+		NSDateComponents *info2 = [previousMonth dateComponentsWithTimeZone:timeZone];
+		NSInteger preDayCnt = [previousMonth daysBetweenDate:currentMonth];
+		if(info.weekday==1){
+			info2.day = preDayCnt - 5;
 		} else {
-			if (info.weekday == 1) {
-				info2.day -= 4;
-			} else {
-				info2.day += 3;
-			}
+			info2.day = preDayCnt - info.weekday + 3;
 		}
-		
-		firstDate = [NSDate dateFromDateInformation:info2];
-		
-		
-		
-	}else{
-		firstDate = d;
+		firstDate = [NSDate dateWithDateComponents:info2];
+	} else {
+		firstDate = currentMonth;
 	}
 	
-	
-	
-	
-	int daysInMonth = [d daysInMonth];
+	NSInteger daysInMonth = [currentMonth daysBetweenDate:nextMonth];
 	info.day = daysInMonth;
-	NSDate *lastInMonth = [NSDate dateFromDateInformation:info];
-	info = [lastInMonth dateInformation];
+	NSDate *lastInMonth = [NSDate dateWithDateComponents:info];
+	NSDateComponents *lastDateInfo = [lastInMonth dateComponentsWithTimeZone:timeZone];
 	
-	if((sunday && info.weekday < 7) || (!sunday && info.weekday != 1)){
-		if (sunday) {
-			info.day = 7 - info.weekday;
+	if(lastDateInfo.weekday < 7 && sunday){
+		lastDateInfo.day = 7 - lastDateInfo.weekday;
+		lastDateInfo.month++;
+		lastDateInfo.weekday = 0;
+		if(lastDateInfo.month>12){
+			lastDateInfo.month = 1;
+			lastDateInfo.year++;
 		}
-		else {
-			info.day = 7 - info.weekday + 1;
-		}
-		info.month++;
-		if(info.month>12){
-			info.month = 1;
-			info.year++;
-		}
-		lastDate = [NSDate dateFromDateInformation:info];
-	}else{
+		lastDate = [NSDate dateWithDateComponents:lastDateInfo];
+        
+	} else if (!sunday && lastDateInfo.weekday != 1){
+		
+		
+		lastDateInfo.day = 8 - lastDateInfo.weekday;
+		lastDateInfo.month++;
+		if(lastDateInfo.month > 12){
+            lastDateInfo.month = 1; lastDateInfo.year++;
+        }
+		lastDate = [NSDate dateWithDateComponents:lastDateInfo];
+        
+	} else {
 		lastDate = lastInMonth;
 	}
 	
-	return [NSArray arrayWithObjects:firstDate,lastDate,nil];
+	return @[firstDate,lastDate];
 }
 
-+ (int) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday {
-    int firstOfPrev = -1;
++ (NSUInteger) rowsForMonth:(NSDate *) date startDayOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone {
+    NSDateComponents *dateInfo = [date dateComponentsWithTimeZone:timeZone];
     
-	TKDateInformation dateInfo = [date dateInformation];
-	int firstWeekday = dateInfo.weekday;
-	int daysInMonth = [date daysInMonth];
-    int lastOfPrev = 0;
-	
-	
-	if((sunday && firstWeekday>1) || (!sunday && firstWeekday!=2)){
-		dateInfo.month--;
-		if(dateInfo.month<1) {
-			dateInfo.month = 12;
-			dateInfo.year--;
-		}
-		NSDate *previousMonth = [NSDate dateFromDateInformation:dateInfo];
-		
-		int preDayCnt = [previousMonth daysInMonth];
-		firstOfPrev = preDayCnt - firstWeekday;
-		if (sunday) {
-			firstOfPrev += 2;
-		} else {
-			if (firstWeekday == 1) {
-				firstOfPrev -= 4;
-			} else {
-				firstOfPrev += 3;
-			}
-		}
-		
-		lastOfPrev = preDayCnt;
-	}
-	
-	int prevDays = (firstOfPrev == -1 ? 0 : lastOfPrev - firstOfPrev + 1);
-	int row = daysInMonth + prevDays;
-	row = (row / 7) + ((row % 7 == 0) ? 0:1);
+    NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:date startOnSunday:sunday timeZone:timeZone];
     
-    return row;
+    NSUInteger numberOfDaysBetween = [dates[0] daysBetweenDate:[dates lastObject]];
+    NSUInteger rows = (numberOfDaysBetween / 7) + 1;
+    return rows;
 }
 
-- (id) initWithFrame:(CGRect)frame month:(NSDate *) date marks:(NSArray *) markArray startOnSunday:(BOOL) sunday {
+- (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray*)markArray startDayOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone
+{
     if ((self = [super initWithFrame:frame])) {
+        gradientColor = [UIColor colorWithPatternImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient.png")]];
+		grayGradientColor = [UIColor colorWithPatternImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient_gray.png")]];
+        
         self.contentMode = UIViewContentModeRedraw;
+        self.timeZone = timeZone;
         firstOfPrev = -1;
         marks = markArray;
         monthDate = date;
         startOnSunday = sunday;
 		
-        TKDateInformation dateInfo = [monthDate dateInformation];
+        NSDateComponents *dateInfo = [_monthDate dateComponentsWithTimeZone:self.timeZone];
         firstWeekday = dateInfo.weekday;
-        daysInMonth = [date daysInMonth];
+        NSDate *prev = [_monthDate previousMonthWithTimeZone:self.timeZone];
+        daysInMonth = [[_monthDate nextMonthWithTimeZone:self.timeZone] daysBetweenDate:_monthDate];
         
+        NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:date startOnSunday:sunday timeZone:self.timeZone];
+        self.datesArray = dates;
         
-        TKDateInformation todayInfo = [[NSDate date] dateInformation];
-        today = (dateInfo.month == todayInfo.month && dateInfo.year == todayInfo.year) ? todayInfo.day : 0;
+        NSDateComponents *todayInfo = [[NSDate date] dateComponentsWithTimeZone:self.timeZone];
+        today = dateInfo.month == todayInfo.month && dateInfo.year == todayInfo.year ? todayInfo.day : -5;
         
-        
-        if((sunday && firstWeekday>1) || (!sunday && firstWeekday!=2)){
-            dateInfo.month--;
-            if(dateInfo.month<1) {
-                dateInfo.month = 12;
-                dateInfo.year--;
-            }
-            NSDate *previousMonth = [NSDate dateFromDateInformation:dateInfo];
-            
-            int preDayCnt = [previousMonth daysInMonth];
-            firstOfPrev = preDayCnt - firstWeekday;
-            if (sunday) {
-                firstOfPrev += 2;
+        NSInteger preDayCnt = [prev daysBetweenDate:_monthDate];
+        if(firstWeekday>1 && sunday){
+            firstOfPrev = preDayCnt - firstWeekday+2;
+            lastOfPrev = preDayCnt;
+        } else if (!sunday && firstWeekday != 2){
+            if(firstWeekday ==1){
+                firstOfPrev = preDayCnt - 5;
             } else {
-                if (firstWeekday == 1) {
-                    firstOfPrev -= 4;
-                } else {
-                    firstOfPrev += 3;
-                }
+                firstOfPrev = preDayCnt - firstWeekday+3;
             }
-            
             lastOfPrev = preDayCnt;
         }
+        NSUInteger numberOfDaysBetween = [dates[0] daysBetweenDate:[dates lastObject]];
+        NSUInteger rows = (numberOfDaysBetween / 7) + 1;
         
-        int prevDays = (firstOfPrev == -1 ? 0 : lastOfPrev - firstOfPrev + 1);
-        int row = daysInMonth + prevDays;
-        row = (row / 7) + ((row % 7 == 0) ? 0:1);
-        
-        visibleDayRows = row;
+        visibleDayRows = rows;
         
         self.multipleTouchEnabled = NO;
         
         return self;
-
     }
     return self;
 }
@@ -251,45 +282,52 @@
 		[[TKTile imageForTileType:TKTileTypeToday] drawInRect:r];
 	}
 	
-	int index = 0;
-
-	UIColor *color = [UIColor grayColor];
-	
-	if(firstOfPrev>0){
+    float myColorValues[] = {1, 1, 1, .8};
+    CGColorSpaceRef myColorSpace = CGColorSpaceCreateDeviceRGB();
+    CGColorRef whiteColor = CGColorCreate(myColorSpace, myColorValues);
+	CGContextSetShadowWithColor(context, CGSizeMake(0,1), 0, whiteColor);
+    
+	float darkColorValues[] = {0, 0, 0, .5};
+    CGColorRef darkColor = CGColorCreate(myColorSpace, darkColorValues);
+    
+    int index = 0;
+	UIColor *color = grayGradientColor;
+	if(firstOfPrev > 0){
 		[color set];
 		for(int i = firstOfPrev;i<= lastOfPrev;i++){
 			r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
-			[TKTile drawTileInRect:r day:i mark:[[marks objectAtIndex:index] boolValue] font:dateFont font2:dotFont];
+			[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context];
 			index++;
 		}
 	}
 	
-
-	color = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
+	color = gradientColor;
 	[color set];
 	for(int i=1; i <= daysInMonth; i++){
-		
 		r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
-		if(today == i) [[UIColor whiteColor] set];
-	
-		[TKTile drawTileInRect:r day:i mark:[[marks objectAtIndex:index] boolValue] font:dateFont font2:dotFont];
-		if(today == i) [color set];
+		if(today == i) {
+            CGContextSetShadowWithColor(context, CGSizeMake(0,-1), 0, darkColor);
+			[[UIColor whiteColor] set];
+        }
+		[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context];
+		if(today == i){
+			CGContextSetShadowWithColor(context, CGSizeMake(0,1), 0, whiteColor);
+			[color set];
+		}
 		index++;
 	}
 	
-	[[UIColor grayColor] set];
-	int i = 1;
+	[grayGradientColor set];
+	NSInteger i = 1;
 	while(index % 7 != 0){
 		r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
-		[TKTile drawTileInRect:r day:i mark:[[marks objectAtIndex:index] boolValue] font:dateFont font2:dotFont];
+		[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context];
 		i++;
 		index++;
 	}
-		
-	
 }
 
-- (void) selectDay:(int)day{
+- (BOOL) selectDay:(NSInteger)day{
 	int pre = firstOfPrev < 0 ?  0 : lastOfPrev - firstOfPrev + 1;
 	
 	int tot = day + pre;
@@ -299,9 +337,8 @@
 	selectedDay = day;
 	selectedPortion = 1;
 	
-
 	if(day == today){
-		self.selectedImageView.shadowOffset = CGSizeMake(0, 1);
+		self.selectedImageView.shadowOffset = CGSizeMake(0, -1);
 		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelectedToday];
 		markWasOnToday = YES;
 	} else if (markWasOnToday) {
@@ -311,53 +348,61 @@
 	}
 	
 	[self addSubview:self.selectedImageView];
-	self.selectedImageView.currentDay.text = [NSString stringWithFormat:@"%d", day];
-	self.selectedImageView.dot.hidden = ![[marks objectAtIndex: row * 7 + column ] boolValue];
-	
-	if(column < 0){
+	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:@(day)];
+    BOOL hasDot = [[marks objectAtIndex: row * 7 + column ] boolValue];
+	self.selectedImageView.dot.hidden = !hasDot;
+    
+    if(column < 0){
 		column = 6;
 		row--;
 	}
     selectedBox = [NSIndexPath indexPathForRow:row inSection:column];
 	self.selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
+    return hasDot;
 }
 
 - (NSDate*) dateSelected {
 	if(selectedDay < 1 || selectedPortion != 1) return nil;
 	
-	TKDateInformation info = [monthDate dateInformation];
+    NSDateComponents *info = [_monthDate dateComponentsWithTimeZone:self.timeZone];
+	info.hour = 0; info.minute = 0; info.second = 0;
 	info.day = selectedDay;
-	return [NSDate dateFromDateInformation:info];
+	NSDate *d = [NSDate dateWithDateComponents:info];
 }
 
 - (void) reactToTouch:(UITouch*)touch down:(BOOL)down {
 	CGPoint p = [touch locationInView:self];
 	if(p.y > self.bounds.size.height || p.y < 0) return;
+    if(p.x > self.bounds.size.width || p.x < 0) return;
 	
-	int column = p.x / self.tileWidth, row = p.y / self.tileHeight;
-	int day = 1, portion = 0;
-    column = column < 0 ? 0 : column;
-    row = row < 0 ? 0 : row;
+	NSInteger column = p.x / self.tileWidth, row = p.y / self.tileHeight;
+	NSInteger day = 1, portion = 0;
 	
-	if(row == (int) (self.bounds.size.height / self.tileHeight)) row --;
+	if(row == (int) (self.bounds.size.height / self.tileHeight)) row--;
 	
-	day = row * 7 + column  - firstWeekday+(startOnSunday ? 2 : (firstWeekday == 1 ? -4 : 3));
-	
-	if (row==0 && day < 1) {
+    NSInteger fir = firstWeekday - 1;
+    if(!startOnSunday && fir == 0) fir = 7;
+	if(!startOnSunday) fir--;
+    if(row == 0 && column < fir){
 		day = firstOfPrev + column;
 	} else {
 		portion = 1;
+		day = row * 7 + column  - firstWeekday+2;
+		if(!startOnSunday) day++;
+		if(!startOnSunday && fir==6) day -= 7;
+        
 	}
-	if (portion > 0 && day > daysInMonth) {
+	if(portion > 0 && day > daysInMonth){
 		portion = 2;
 		day = day - daysInMonth;
 	}
 	
 	if(portion != 1){
 		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeDarken];
+        self.selectedImageView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.15];
 		markWasOnToday = YES;
 	} else if(portion==1 && day == today) {
-		self.selectedImageView.shadowOffset = CGSizeMake(0, 1);
+		self.selectedImageView.shadowOffset = CGSizeMake(0, -1);
 		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelectedToday];
 		markWasOnToday = YES;
 	} else if(markWasOnToday) {
@@ -367,11 +412,11 @@
 	}
 	
 	[self addSubview:self.selectedImageView];
-	self.selectedImageView.currentDay.text = [NSString stringWithFormat:@"%d", day];
+	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:@(day)];
 	self.selectedImageView.dot.hidden = ![[marks objectAtIndex: row * 7 + column] boolValue];
 	
     selectedBox = [NSIndexPath indexPathForRow:row inSection:column];
-	self.selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];;
+	self.selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
 	
 	if (day == selectedDay && selectedPortion == portion) return;
 	
@@ -380,10 +425,10 @@
 	if (portion == 1){
 		selectedDay = day;
 		selectedPortion = portion;
-        objc_msgSend(target, action, [NSArray arrayWithObject:[NSNumber numberWithInt:day]]);
+        objc_msgSend(target, action, @[@(day)]);
 
 	} else if(down){
-        objc_msgSend(target, action, [NSArray arrayWithObjects:[NSNumber numberWithInt:day],[NSNumber numberWithInt:portion],nil]);
+        objc_msgSend(target, action, @[@(day),@(portion)]);
 		selectedDay = day;
 		selectedPortion = portion;
 	}
@@ -403,6 +448,7 @@
 - (TKTile *) selectedImageView {
 	if(selectedImageView==nil){
 		selectedImageView = [[TKTile alloc] initWithFrame:CGRectZero];
+        selectedImageView.layer.magnificationFilter = kCAFilterNearest;
 		selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected];
 	}
 	return selectedImageView;

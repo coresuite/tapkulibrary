@@ -56,6 +56,9 @@
 @property (readonly) int visibleDayRows;
 @property (readonly) NSDate *monthDate;
 @property (readonly) TKTile *selectedImageView;
+@property (nonatomic, strong) NSArray *datesArray;
+@property (nonatomic, strong) NSMutableArray *accessibleElements;
+@property (nonatomic, strong) NSTimeZone *timeZone;
 
 - (id) initWithFrame:(CGRect)frame month:(NSDate *) date marks:(NSArray *) markArray startOnSunday:(BOOL) sunday;
 - (void) setTarget:(id)target action:(SEL)action;

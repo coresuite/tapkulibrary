@@ -25,7 +25,8 @@ typedef enum {
 @property (nonatomic) CGSize shadowOffset;
 
 + (void) drawTileInRect:(CGRect)r day:(int)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2;
- 
+
++ (NSString *) stringFromDayNumber:(int) day;
 
 + (UIImage *) imageForTileType:(TKTileType) tileType;
 + (UIFont *) fontForDateLabelForTileRect:(CGRect) tileRect;
