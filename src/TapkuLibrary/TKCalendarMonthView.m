@@ -131,15 +131,28 @@
         if (!sunday) {
             startDateOffset = 1;
         }
-        NSDate *startingDate = [NSDate dateWithTimeIntervalSince1970:3*24*60*60 + startDateOffset * 24*60*60 + 2];
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"E"];
+        NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+        dateFormat.dateFormat = @"E";
+        dateFormat.timeZone = self.timeZone;
+        
+        NSDateComponents *sund = [[NSDateComponents alloc] init];
+        sund.day = 5;   // sunday
+        sund.month = 12;
+        sund.year = 2010;
+        sund.hour = sund.minute = sund.second = sund.weekday = 0;
+        sund.timeZone = self.timeZone;
+        if (!sunday) {
+            sund.day = 6;   // monday
+        }
+        NSDate *startingDate = [NSDate dateWithDateComponents:sund]; // it will be sunday or monday
+        NSString *ss = [dateFormat stringFromDate:startingDate];
+        NSLog(@"%@", ss);
         for (NSInteger i = 0; i < 7; ++i) {
-            // name of a day of the week of 0 date is Thu
-            NSString *str = [dateFormatter stringFromDate:startingDate];
+            NSString *str = [dateFormat stringFromDate:startingDate];
             [ar addObject:str];
             startingDate = [startingDate dateByAddingTimeInterval:24*60*60 + 1];
         }
+        NSLog(@"%@", ar);
         int i = 0;
         for(NSString *s in ar){
             UILabel *dayLabel = [self.header.dayLabels objectAtIndex:i];
