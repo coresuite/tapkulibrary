@@ -35,10 +35,6 @@
 #import "NSDate+CalendarGrid.h"
 #import "TKGlobal.h"
 
-#define kCalendImagesPath @"TapkuLibrary.bundle/Images/calendar/"
-
-static const CGFloat fCalendarHeaderHeight = 44.0f;
-
 @interface TKCalendarMonthView (private)
 @property (readonly) UIScrollView *tileBox;
 @property (readonly) UIImageView *shadow;
@@ -49,6 +45,10 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 @synthesize delegate, dataSource, sizeDelegate;
 @synthesize header;
 @synthesize timeZone;
+
++ (CGFloat) headerHeight {
+    return 44.0f;
+}
 
 + (NSUInteger) rowsForMonth:(NSDate *) date {
     return [self rowsForMonth:date timeZone:[NSTimeZone defaultTimeZone]];
@@ -156,9 +156,9 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 	
 	int overlap =  0;
 	if(isNext){
-		overlap = [newTile.monthDate isEqualToDate:[dates objectAtIndex:0]] ? 0 : fCalendarHeaderHeight;
+		overlap = [newTile.monthDate isEqualToDate:[dates objectAtIndex:0]] ? 0 : [TKCalendarMonthView headerHeight];
 	} else {
-		overlap = [currentTile.monthDate compare:[dates lastObject]] !=  NSOrderedDescending ? fCalendarHeaderHeight : 0;
+		overlap = [currentTile.monthDate compare:[dates lastObject]] !=  NSOrderedDescending ? [TKCalendarMonthView headerHeight] : 0;
 	}
 	
 	float y = isNext ? currentTile.bounds.size.height - overlap : newTile.bounds.size.height * -1 + overlap;
@@ -271,7 +271,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 		[currentTile removeFromSuperview];
 		currentTile = newTile;
 		[self.tileBox addSubview:currentTile];
-		self.tileBox.frame = CGRectMake(0, fCalendarHeaderHeight, newTile.frame.size.width, newTile.frame.size.height);
+		self.tileBox.frame = CGRectMake(0, [TKCalendarMonthView headerHeight], newTile.frame.size.width, newTile.frame.size.height);
 		self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.bounds.size.width, self.tileBox.frame.size.height+self.tileBox.frame.origin.y);
 
         CGFloat outsideShadowHeight = 21.0f;
@@ -345,13 +345,14 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
     [super layoutSubviews];
     
     int rows = [TKCalendarMonthView rowsForMonth:[currentTile monthDate]];
-    CGFloat height = (CGRectGetWidth(self.bounds) / 7.0f) * rows;
+    CGFloat height = [TKTile effectiveTileWidthForTilesWidth:CGRectGetWidth(self.bounds)] * rows;
     CGFloat width = CGRectGetWidth(self.bounds);
     CGFloat shadowImageHeight = [shadow image].size.height;
+    CGFloat tilesOffset = [TKTile tileStartOffsetForTilesWidth:self.bounds.size.width];
 
     CGFloat outsideShadowHeight = 21.0f;
-    header.frame = CGRectMake(0.0f, 0.0f, width, fCalendarHeaderHeight);
-    tileBox.frame = CGRectMake(0, fCalendarHeaderHeight, CGRectGetWidth(self.bounds), height);
+    header.frame = CGRectMake(0.0f, 0.0f, width, [TKCalendarMonthView headerHeight]);
+    tileBox.frame = CGRectMake(tilesOffset, [TKCalendarMonthView headerHeight], CGRectGetWidth(self.bounds), height);
     shadow.frame = CGRectMake(0, CGRectGetHeight(self.frame) - shadowImageHeight + outsideShadowHeight, width, shadowImageHeight);
     
     currentTile.frame = CGRectMake(0.0f, 0.0f, width, height);
@@ -373,7 +374,6 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 
 - (UIImageView *) shadow {
 	if(shadow==nil){
-        //FIXME: no such image, what do we do?
 		shadow = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Shadow.png")]];
 	}
 	return shadow;

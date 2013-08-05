@@ -123,6 +123,38 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 	}
 }
 
++ (CGFloat) tileStartOffsetForTilesWidth:(CGFloat)tilesWidth {
+    CGFloat tileOffset = 0.0f;
+    CGFloat tileWidth = tilesWidth / 7.0f;
+    CGFloat leftWidth = tilesWidth - 7.0f * floorf(tileWidth);
+    if (leftWidth > 0.001) {
+        // width is not integral
+        if (leftWidth <= 2.0f) {
+            tileOffset = 1.0f;
+        } else if (leftWidth <= 4) {
+            tileOffset = 2.0f;
+        } else if (leftWidth <= 6) {
+            tileOffset = -1.0f;
+        }
+    }
+    return tileOffset;
+}
+
++ (CGFloat) effectiveTileWidthForTilesWidth:(CGFloat)tilesWidth {
+    CGFloat effectiveTileWidth = tilesWidth / 7.0f;
+    CGFloat leftWidth = tilesWidth - (7.0f * floorf(effectiveTileWidth));
+    effectiveTileWidth = floorf(effectiveTileWidth);
+    if (leftWidth > 0.001) {
+        // width is not integral
+        if (leftWidth <= 3.0f) {
+            // width no change -> offset will change
+        } else if (leftWidth <= 5.0f) {
+            effectiveTileWidth += 1;
+        }
+    }
+    return effectiveTileWidth;
+}
+
 + (UIImage *) imageForTileType:(TKTileType) tileType {
 	UIImage *imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")]; // not selected
 	if (tileType == TKTileTypeSelected) {

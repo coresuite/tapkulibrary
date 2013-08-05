@@ -63,6 +63,7 @@
 
 - (CGFloat) maximumHeight;
 
++ (CGFloat) headerHeight;
 + (NSUInteger) rowsForMonth:(NSDate *) date;
 + (NSUInteger) rowsForMonth:(NSDate *) date timeZone:(NSTimeZone *) timeZone;
 @end

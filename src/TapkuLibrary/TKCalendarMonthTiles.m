@@ -114,7 +114,7 @@
 #pragma mark - Measurements
 
 - (CGFloat) tileWidth {
-    return CGRectGetWidth(self.bounds) / 7.0f;
+    return [TKTile effectiveTileWidthForTilesWidth:self.bounds.size.width];
 }
 
 - (CGFloat) tileHeight {

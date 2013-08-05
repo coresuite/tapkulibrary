@@ -32,4 +32,7 @@ typedef enum {
 + (UIFont *) fontForDateLabelForTileRect:(CGRect) tileRect;
 + (UIFont *) fontForDotLabelForTileRect:(CGRect) tileRect;
 
++ (CGFloat) tileStartOffsetForTilesWidth:(CGFloat)tilesWidth;
++ (CGFloat) effectiveTileWidthForTilesWidth:(CGFloat)tilesWidth;
+
 @end
