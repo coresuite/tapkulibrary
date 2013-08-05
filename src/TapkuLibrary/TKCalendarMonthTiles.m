@@ -205,8 +205,14 @@
 - (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray*)markArray startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone
 {
     if ((self = [super initWithFrame:frame])) {
-        gradientColor = [UIColor colorWithPatternImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient.png")]];
-		grayGradientColor = [UIColor colorWithPatternImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient_gray.png")]];
+        UIImage *gradientImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient.png")];
+        UIImage *grayGradientImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient_gray.png")];
+        UIImage *gradientImageStreched = [gradientImage stretchableImageWithLeftCapWidth:gradientImage.size.width
+                                                                            topCapHeight:floorf(gradientImage.size.height/2)];
+        UIImage *grayGradientImageStreched = [grayGradientImage stretchableImageWithLeftCapWidth:grayGradientImage.size.width
+                                                                                    topCapHeight:floorf(grayGradientImage.size.height/2)];
+        gradientColor = [UIColor colorWithPatternImage:gradientImageStreched];
+		grayGradientColor = [UIColor colorWithPatternImage:grayGradientImageStreched];
         
         self.contentMode = UIViewContentModeRedraw;
         self.timeZone = timeZone;
@@ -351,8 +357,10 @@
 		markWasOnToday = NO;
 	}
 	
-	[self addSubview:self.selectedImageView];
-	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:@(day)];
+    if ([self.selectedImageView superview] != nil) {
+        [self addSubview:self.selectedImageView];
+    }
+	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:day];
     BOOL hasDot = [[marks objectAtIndex: row * 7 + column ] boolValue];
 	self.selectedImageView.dot.hidden = !hasDot;
     
@@ -418,7 +426,7 @@
 	}
 	
 	[self addSubview:self.selectedImageView];
-	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:@(day)];
+	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:day];
 	self.selectedImageView.dot.hidden = ![[marks objectAtIndex: row * 7 + column] boolValue];
 	
     selectedBox = [NSIndexPath indexPathForRow:row inSection:column];

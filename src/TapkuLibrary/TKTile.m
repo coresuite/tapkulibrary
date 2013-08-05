@@ -89,7 +89,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 	dot.frame = rectForDay;
 }
 
-+ (NSString *) stringFromDayNumber:(int) day {
++ (NSString *) stringFromDayNumber:(NSInteger) day {
     static NSNumberFormatter *formatter = nil;
     if (formatter == nil) {
         formatter = [[NSNumberFormatter alloc] init];
@@ -97,13 +97,16 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     return [formatter stringFromNumber:@(day)];
 }
 
-+ (void) drawTileInRect:(CGRect)tileRect day:(int)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 context:(CGContextRef)context {
++ (void) drawTileInRect:(CGRect)tileRect day:(NSInteger)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 context:(CGContextRef)context {
 	NSString *str = [TKTile stringFromDayNumber:day];
 	
 	CGRect r = [TKTile rectForLabelForTileRect:tileRect labelFont:f1];
 	
-    //TODO: new line!
-    CGContextSetPatternPhase(context, CGSizeMake(r.origin.x, r.origin.y - 2));
+    CGFloat heightCorrection = -2;
+    if (r.size.height >= 27.0f) {
+        heightCorrection = 4;
+    }
+    CGContextSetPatternPhase(context, CGSizeMake(r.origin.x, r.origin.y + heightCorrection));
     
 	[str drawInRect: r
 		   withFont: f1
@@ -121,15 +124,16 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 }
 
 + (UIImage *) imageForTileType:(TKTileType) tileType {
-	UIImage *imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile.png")]; // not selected
+	UIImage *imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")]; // not selected
 	if (tileType == TKTileTypeSelected) {
-		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile Selected.png")];
+        NSString *path = TKBUNDLE(@"calendar/dateTileSelected.png");
+        imageToReturn = [[UIImage imageWithContentsOfFile:path] stretchableImageWithLeftCapWidth:1 topCapHeight:0];
 	} else if (tileType == TKTileTypeSelectedToday) {
-		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Today Selected Tile.png")];
+		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/todayselected.png")];
 	} else if (tileType == TKTileTypeDarken) {
 		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile Gray.png")];
 	} else if(tileType == TKTileTypeToday) {
-		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Today Tile.png")];
+		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/today.png")];
 	}
 
 

@@ -80,7 +80,7 @@ static UIImage *tileImage;
 
 + (void) initialize{
     if (self == [TKCalendarMonthTiles class]){
-        tileImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile.png")];
+        tileImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")];
     }
 }
 
@@ -607,7 +607,7 @@ static UIImage *tileImage;
 - (UIImageView *) selectedImageView{
 	if(_selectedImageView) return _selectedImageView;
 	
-	NSString *path = TKBUNDLE(@"calendar/Month Calendar Date Tile Selected.png");
+	NSString *path = TKBUNDLE(@"calendar/dateTileSelected.png");
 	UIImage *img = [[UIImage imageWithContentsOfFile:path] stretchableImageWithLeftCapWidth:1 topCapHeight:0];
 	_selectedImageView = [[UIImageView alloc] initWithImage:img];
 	_selectedImageView.layer.magnificationFilter = kCAFilterNearest;

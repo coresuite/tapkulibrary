@@ -110,6 +110,7 @@
 }
 
 #pragma mark Same Day
+
 - (BOOL) isSameDay:(NSDate*)anotherDate{
 	return [self isSameDay:anotherDate timeZone:[NSTimeZone defaultTimeZone]];
 }
@@ -169,7 +170,8 @@
 	
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	gregorian.timeZone = timeZone;
-	return [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSTimeZoneCalendarUnit) fromDate:self];
+    NSDateComponents *components = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSTimeZoneCalendarUnit) fromDate:self];
+	return components;
 }
 + (NSDate*) dateWithDateComponents:(NSDateComponents*)components{
 	

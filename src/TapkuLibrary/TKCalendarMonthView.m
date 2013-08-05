@@ -43,10 +43,6 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 @property (readonly) UIScrollView *tileBox;
 @property (readonly) UIImageView *shadow;
 
-- (NSDate*) firstOfMonthFromDate:(NSDate*)date;
-- (NSDate*) nextMonthFromDate:(NSDate*)date;
-- (NSDate*) previousMonthFromDate:(NSDate*)date;
-
 @end
 
 @implementation TKCalendarMonthView
@@ -100,7 +96,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
         self.timeZone = tz;
         sunday = s;
         
-        NSDate *month = [self firstOfMonthFromDate:[NSDate date]];
+        NSDate *month = [[NSDate date] firstOfMonthWithTimeZone:tz];
         
         currentTile = [[TKCalendarMonthTiles alloc] initWithFrame:CGRectZero month:month marks:nil startOnSunday:sunday timeZone:tz];
         [currentTile setTarget:self action:@selector(tile:)];
@@ -377,6 +373,7 @@ static const CGFloat fCalendarHeaderHeight = 44.0f;
 
 - (UIImageView *) shadow {
 	if(shadow==nil){
+        //FIXME: no such image, what do we do?
 		shadow = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Shadow.png")]];
 	}
 	return shadow;
