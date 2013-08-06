@@ -63,40 +63,27 @@
 }
 
 + (NSUInteger) rowsForMonth:(NSDate *) date {
-    return [self rowsForMonth:date timeZone:[NSTimeZone defaultTimeZone]];
+    return [TKCalendarMonthTiles rowsForMonth:date startDayOnSunday:[NSDate sundayShouldBeFirst] timeZone:[NSTimeZone defaultTimeZone]];
 }
 
 + (NSUInteger) rowsForMonth:(NSDate *) date timeZone:(NSTimeZone *) timeZone {
-    return [TKCalendarMonthTiles rowsForMonth:date startDayOnSunday:YES timeZone:timeZone];
+    return [TKCalendarMonthTiles rowsForMonth:date startDayOnSunday:[NSDate sundayShouldBeFirst] timeZone:timeZone];
 }
 
 - (CGFloat) maximumHeight {
 	return CGRectGetHeight(header.bounds) + CGRectGetHeight(currentTile.selectedImageView.bounds) * 6;
 }
 
-+ (BOOL) sundayShouldBeFirst {
-	BOOL sundayAsFirst = YES;
-	
-	NSLocale *prefLocale = [NSLocale autoupdatingCurrentLocale];
-	NSCalendar *prefCalendar = [prefLocale objectForKey:NSLocaleCalendar];
-	
-	NSUInteger weekday = [prefCalendar firstWeekday];
-	if(weekday == 2){
-		sundayAsFirst = NO;
-	}
-	return sundayAsFirst;
-}
-
 - (id) init {
-	return [self initWithSundayAsFirst:[TKCalendarMonthView sundayShouldBeFirst]];
+	return [self initWithSundayAsFirst:[NSDate sundayShouldBeFirst]];
 }
 
 - (id) initWithFrame:(CGRect)aFrame {
-	return [self initWithFrame:aFrame sundayAsFirst:[TKCalendarMonthView sundayShouldBeFirst]];
+	return [self initWithFrame:aFrame sundayAsFirst:[NSDate sundayShouldBeFirst]];
 }
 
 - (id) initWithSundayAsFirst:(BOOL)sunday {
-	return [self initWithFrame:CGRectZero sundayAsFirst:[TKCalendarMonthView sundayShouldBeFirst]];
+	return [self initWithFrame:CGRectZero sundayAsFirst:[NSDate sundayShouldBeFirst]];
 }
 
 - (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s {
@@ -126,38 +113,12 @@
         [self.header.rightArrow addTarget:self action:@selector(changeMonth:) forControlEvents:UIControlEventTouchUpInside];
         [self.header.leftArrow addTarget:self action:@selector(changeMonth:) forControlEvents:UIControlEventTouchUpInside];
         
-        NSMutableArray *ar = [[NSMutableArray alloc] init];
-        NSInteger startDateOffset = 0;
-        if (!sunday) {
-            startDateOffset = 1;
-        }
-        NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-        dateFormat.dateFormat = @"E";
-        dateFormat.timeZone = self.timeZone;
-        
-        NSDateComponents *sund = [[NSDateComponents alloc] init];
-        sund.day = 5;   // sunday
-        sund.month = 12;
-        sund.year = 2010;
-        sund.hour = sund.minute = sund.second = sund.weekday = 0;
-        sund.timeZone = self.timeZone;
-        if (!sunday) {
-            sund.day = 6;   // monday
-        }
-        NSDate *startingDate = [NSDate dateWithDateComponents:sund]; // it will be sunday or monday
-        NSString *ss = [dateFormat stringFromDate:startingDate];
-        NSLog(@"%@", ss);
-        for (NSInteger i = 0; i < 7; ++i) {
-            NSString *str = [dateFormat stringFromDate:startingDate];
-            [ar addObject:str];
-            startingDate = [startingDate dateByAddingTimeInterval:24*60*60 + 1];
-        }
-        NSLog(@"%@", ar);
-        int i = 0;
+        NSArray *ar = [NSDate dayDescriptionsStartingOnSunday:sunday];
+        NSInteger i = 0;
         for(NSString *s in ar){
             UILabel *dayLabel = [self.header.dayLabels objectAtIndex:i];
             dayLabel.text = s;
-            i++;
+            ++i;
         }
 
     }
@@ -207,11 +168,11 @@
 	CGFloat outsideShadowHeight = 21.0f;
 	if(isNext){
 		currentTile.frame = CGRectMake(0, -1 * currentTile.bounds.size.height + overlap, currentTile.frame.size.width, currentTile.frame.size.height);
-		newTile.frame = CGRectMake(0, 1, newTile.frame.size.width, newTile.frame.size.height);
+		newTile.frame = CGRectMake(0, 0, newTile.frame.size.width, newTile.frame.size.height);
 		self.tileBox.frame = CGRectMake(self.tileBox.frame.origin.x, self.tileBox.frame.origin.y, self.tileBox.frame.size.width, newTile.frame.size.height);
 		self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.bounds.size.width, self.tileBox.frame.size.height+self.tileBox.frame.origin.y);
 	} else {
-		newTile.frame = CGRectMake(0, 1, newTile.frame.size.width, newTile.frame.size.height);
+		newTile.frame = CGRectMake(0, 0, newTile.frame.size.width, newTile.frame.size.height);
 		self.tileBox.frame = CGRectMake(self.tileBox.frame.origin.x, self.tileBox.frame.origin.y, self.tileBox.frame.size.width, newTile.frame.size.height);
 		self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.bounds.size.width, self.tileBox.frame.size.height+self.tileBox.frame.origin.y);
 		currentTile.frame = CGRectMake(0,  newTile.frame.size.height - overlap, currentTile.frame.size.width, currentTile.frame.size.height);

@@ -37,6 +37,10 @@
 /** Additional functionality for `NSDate`. */
 @interface NSDate (TKCategory)
 
++ (BOOL) sundayShouldBeFirst;
+
++ (NSArray *) dayDescriptionsStartingOnSunday:(BOOL) sunday;
++ (NSArray *) dayDescriptionsStartingOnSunday:(BOOL) sunday locale:(NSLocale *) localeOrNilForDefault;
 
 #pragma mark Yesterday
 /** Creates and returns a new date set to the previous day and current time.

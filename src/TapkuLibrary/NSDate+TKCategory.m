@@ -33,6 +33,50 @@
 #pragma mark - NSDate + TKCategory
 @implementation NSDate (TKCategory)
 
++ (BOOL) sundayShouldBeFirst {
+	BOOL sundayAsFirst = YES;
+	
+	NSLocale *prefLocale = [NSLocale autoupdatingCurrentLocale];
+	NSCalendar *prefCalendar = [prefLocale objectForKey:NSLocaleCalendar];
+	
+	NSUInteger weekday = [prefCalendar firstWeekday];
+	if(weekday == 2){
+		sundayAsFirst = NO;
+	}
+	return sundayAsFirst;
+}
+
++ (NSArray *) dayDescriptionsStartingOnSunday:(BOOL) sunday locale:(NSLocale *) localeOrNilForDefault {
+    NSMutableArray *ar = [[NSMutableArray alloc] init];
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    dateFormat.dateFormat = @"E";
+    dateFormat.timeZone = [NSTimeZone timeZoneWithName:@"Europe/Zurich"];
+    if (localeOrNilForDefault != nil) {
+        dateFormat.locale = localeOrNilForDefault;
+    }
+    
+    NSDateComponents *sund = [[NSDateComponents alloc] init];
+    sund.day = 11;   // sunday
+    sund.month = 8;
+    sund.year = 2013;
+    sund.hour = sund.minute = sund.second = sund.weekday = 0;
+    sund.timeZone = dateFormat.timeZone;
+    if (!sunday) {
+        sund.day = 12;   // monday
+    }
+    NSDate *startingDate = [NSDate dateWithDateComponents:sund]; // it will be sunday or monday
+    for (NSInteger i = 0; i < 7; ++i) {
+        NSString *str = [dateFormat stringFromDate:startingDate];
+        [ar addObject:str];
+        startingDate = [startingDate dateByAddingTimeInterval:24*60*60 + 1];
+    }
+    return [ar copy];
+}
+
++ (NSArray *) dayDescriptionsStartingOnSunday:(BOOL) sunday {
+    return [NSDate dayDescriptionsStartingOnSunday:sunday locale:nil];
+}
+
 #pragma mark Yesterday
 + (NSDate*) yesterday{
 	return [NSDate yesterdayWithTimeZone:[NSTimeZone defaultTimeZone]];

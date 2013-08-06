@@ -193,7 +193,7 @@
     NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:date startOnSunday:sunday timeZone:timeZone];
     
     NSUInteger numberOfDaysBetween = [dates[0] daysBetweenDate:[dates lastObject]];
-    NSUInteger rows = (numberOfDaysBetween / 7) + 1;
+    NSUInteger rows = (numberOfDaysBetween / 7);
     return rows;
 }
 
@@ -239,10 +239,8 @@
             }
             lastOfPrev = preDayCnt;
         }
-        NSUInteger numberOfDaysBetween = [dates[0] daysBetweenDate:[dates lastObject]];
-        NSUInteger rows = (numberOfDaysBetween / 7) + 1;
         
-        visibleDayRows = rows;
+        visibleDayRows = [TKCalendarMonthTiles rowsForMonth:self.monthDate startDayOnSunday:startOnSunday timeZone:self.timeZone];
         
         self.multipleTouchEnabled = NO;
         [self addSubview:self.selectedImageView];
