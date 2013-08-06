@@ -15,7 +15,12 @@
 	UIButton *rightArrow;
 	UILabel	 *titleView;
 	NSArray *dayLabels;
+    
+    CGFloat tileWidth;
+    CGFloat tileStartOffset;
 }
+@property (nonatomic) CGFloat tileWidth;
+@property (nonatomic) CGFloat tileStartOffset;
 @property (nonatomic, readonly) NSArray *dayLabels;
 @property (nonatomic, readonly) UIButton *leftArrow;
 @property (nonatomic, readonly) UIButton *rightArrow;

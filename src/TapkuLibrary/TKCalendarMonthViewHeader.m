@@ -15,7 +15,19 @@
 @synthesize titleView;
 @synthesize accessoryView;
 @synthesize dayLabels;
+@synthesize tileStartOffset;
+@synthesize tileWidth;
 @dynamic backgroundImage;
+
+- (void) setTileWidth:(CGFloat)aTileWidth {
+    tileWidth = aTileWidth;
+    [self setNeedsLayout];
+}
+
+- (void) setTileStartOffset:(CGFloat)aTileStartOffset {
+    tileStartOffset = aTileStartOffset;
+    [self setNeedsLayout];
+}
 
 - (void) setBackgroundImage:(UIImage *) image {
 	backgroundView.image = image;
