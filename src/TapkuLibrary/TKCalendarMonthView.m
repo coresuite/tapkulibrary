@@ -320,13 +320,13 @@
         NSDateComponents *info = [[currentTile monthDate] dateComponentsWithTimeZone:self.timeZone];
 		info.day = day;
         NSDate *dateForMonth = [NSDate dateWithDateComponents:info];
+        [currentTile selectDay:day];
 		if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)]) {
             [self.delegate calendarMonthView:self didSelectDate:dateForMonth];
         }
 		if([self.delegate respondsToSelector:@selector(calendarMonthView:monthDidChange:animated:)]) {
             [self.delegate calendarMonthView:self monthDidChange:dateForMonth animated:YES];
         }
-		[currentTile selectDay:day];
 	}
 	
 }

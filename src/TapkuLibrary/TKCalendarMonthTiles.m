@@ -427,18 +427,16 @@
     [self setNeedsLayout];
 	
 	if (day == selectedDay && selectedPortion == portion) return;
-	
+
+	selectedDay = day;
 	if (portion == 1){
-		selectedDay = day;
 		selectedPortion = portion;
         objc_msgSend(target, action, @[@(day)]);
 
 	} else if(down){
         objc_msgSend(target, action, @[@(day),@(portion)]);
-		selectedDay = day;
 		selectedPortion = portion;
 	}
-
 }
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
 	//[super touchesBegan:touches withEvent:event];
