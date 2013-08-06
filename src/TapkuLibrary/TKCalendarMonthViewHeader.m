@@ -114,11 +114,11 @@
     CGRectInset(accessoryViewFrame, -10.0f, -10.0f); // make the button a little bit more touch sensitive
     accessoryView.frame = accessoryViewFrame;
     
-	CGFloat fCalendarHeaderDaysLabelsWidth = floorf(CGRectGetWidth(self.bounds) / 7);
+	CGFloat fCalendarHeaderDaysLabelsWidth = tileWidth;
 	CGFloat fDayLabelHeight = 15.0f;
 	NSInteger labelIndex = 0;
 	for (UILabel *dayLabel in dayLabels) {
-		dayLabel.frame = CGRectMake(fCalendarHeaderDaysLabelsWidth * labelIndex, CGRectGetHeight(self.bounds) - fDayLabelHeight, fCalendarHeaderDaysLabelsWidth, fDayLabelHeight);
+		dayLabel.frame = CGRectMake(tileStartOffset + fCalendarHeaderDaysLabelsWidth * labelIndex, CGRectGetHeight(self.bounds) - fDayLabelHeight, fCalendarHeaderDaysLabelsWidth, fDayLabelHeight);
 		++labelIndex;
 	}
 	

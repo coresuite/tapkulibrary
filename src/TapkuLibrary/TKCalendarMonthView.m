@@ -341,6 +341,8 @@
 
     CGFloat outsideShadowHeight = 21.0f;
     header.frame = CGRectMake(0.0f, 0.0f, width, [TKCalendarMonthView headerHeight]);
+    header.tileStartOffset = tilesOffset;
+    header.tileWidth = [TKTile effectiveTileWidthForTilesWidth:width];
     tileBox.frame = CGRectMake(tilesOffset, [TKCalendarMonthView headerHeight], CGRectGetWidth(self.bounds), height);
     shadow.frame = CGRectMake(0, CGRectGetHeight(self.frame) - shadowImageHeight + outsideShadowHeight, width, shadowImageHeight);
     
