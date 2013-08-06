@@ -52,7 +52,6 @@
 
 @end
 
-
 @interface TKCalendarMonthTiles (private)
 @property (readonly) TKTile *selectedImageView;
 @end
@@ -175,22 +174,18 @@
 			lastDateInfo.month = 1;
 			lastDateInfo.year++;
 		}
-		lastDate = [NSDate dateWithDateComponents:lastDateInfo];
-        
 	} else if (!sunday && lastDateInfo.weekday != 1){
-		
-		
 		lastDateInfo.day = 8 - lastDateInfo.weekday;
 		lastDateInfo.month++;
 		if(lastDateInfo.month > 12){
-            lastDateInfo.month = 1; lastDateInfo.year++;
+            lastDateInfo.month = 1;
+            lastDateInfo.year++;
         }
-		lastDate = [NSDate dateWithDateComponents:lastDateInfo];
-        
-	} else {
-		lastDate = lastInMonth;
 	}
-	
+    lastDateInfo.hour = 23;
+    lastDateInfo.minute = 59;
+    lastDateInfo.second = 59;
+	lastDate = [NSDate dateWithDateComponents:lastDateInfo];
 	return @[firstDate,lastDate];
 }
 
