@@ -281,7 +281,7 @@
 		int pre = firstOfPrev > 0 ? lastOfPrev - firstOfPrev + 1 : 0;
 		int index = today +  pre-1;
 		CGRect r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
-		r.origin.y -= 1.0f;
+		r.origin.y += 0.0f;
 		[[TKTile imageForTileType:TKTileTypeToday] drawInRect:r];
 	}
 	

@@ -75,17 +75,13 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     dot.font = [TKTile fontForDotLabelForTileRect:self.bounds];
     
 	CGRect r = self.bounds;
-	CGFloat fDrawingAndUIViewPositioningDifference = 1.0f; // diference between drawn text and label of the same frame
 	
 	// label
 	CGRect rectForDay = [TKTile rectForLabelForTileRect:r labelFont:currentDay.font];
-	rectForDay.origin.y += fDrawingAndUIViewPositioningDifference;		
 	currentDay.frame = rectForDay;
-	rectForDay.origin.y -= fDrawingAndUIViewPositioningDifference;
 	
 	// dot
 	convertDateLabelRectToDotRect(&rectForDay, dot.font, dot.text);
-	rectForDay.origin.y += fDrawingAndUIViewPositioningDifference;
 	dot.frame = rectForDay;
 }
 
