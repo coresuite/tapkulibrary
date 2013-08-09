@@ -1022,7 +1022,7 @@
 				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = TapkuCore;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1072,6 +1072,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = "./**";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = MonthCalendar;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
