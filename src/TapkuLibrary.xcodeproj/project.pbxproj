@@ -1026,6 +1026,7 @@
 				PRODUCT_NAME = TapkuCore;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "armv7 armv7s i386";
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -1049,6 +1050,7 @@
 				PRODUCT_NAME = TapkuCore;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "armv7 armv7s i386";
 				ZERO_LINK = NO;
 			};
 			name = Release;
