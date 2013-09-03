@@ -231,7 +231,7 @@
 	return [currentTile monthDate];
 }
 
-- (BOOL) selectDate:(NSDate*)date {
+- (BOOL) selectDate:(NSDate*)date userInfo:(NSDictionary *) userInfo {
     if(date == nil) date = [NSDate date];
     
     NSDateComponents *info = [date dateComponentsWithTimeZone:self.timeZone];
@@ -276,28 +276,24 @@
             [self.delegate calendarMonthView:self monthDidChange:date animated:NO];
         }
 	}
-    if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)]) {
-        [self.delegate calendarMonthView:self didSelectDate:[self dateSelected]];
+    if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:userInfo:)]) {
+        [self.delegate calendarMonthView:self didSelectDate:[self dateSelected] userInfo:userInfo];
     }
     
     return ret;
 }
+
 - (void) reload {
 	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:[currentTile monthDate] startOnSunday:sunday timeZone:self.timeZone];
 	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
 	
-    TKCalendarMonthTiles *refresh = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:[currentTile monthDate] marks:ar startOnSunday:sunday timeZone:self.timeZone];
-	[refresh setTarget:self action:@selector(tile:)];
-	
-	[self.tileBox addSubview:refresh];
-	[currentTile removeFromSuperview];
-	currentTile = refresh;
+    [currentTile setMarks:ar];
 }
 
 - (void) tile:(NSArray*)ar{
 	if([ar count] < 2){
-        if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)]) {
-            [self.delegate calendarMonthView:self didSelectDate:[self dateSelected]];
+        if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:userInfo:)]) {
+            [self.delegate calendarMonthView:self didSelectDate:[self dateSelected] userInfo:nil];
         }
 	} else {
 		NSInteger direction = [[ar lastObject] intValue];
@@ -321,8 +317,8 @@
 		info.day = day;
         NSDate *dateForMonth = [NSDate dateWithDateComponents:info];
         [currentTile selectDay:day];
-		if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:)]) {
-            [self.delegate calendarMonthView:self didSelectDate:dateForMonth];
+		if([self.delegate respondsToSelector:@selector(calendarMonthView:didSelectDate:userInfo:)]) {
+            [self.delegate calendarMonthView:self didSelectDate:dateForMonth userInfo:nil];
         }
 		if([self.delegate respondsToSelector:@selector(calendarMonthView:monthDidChange:animated:)]) {
             [self.delegate calendarMonthView:self monthDidChange:dateForMonth animated:YES];

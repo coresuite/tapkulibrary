@@ -59,7 +59,7 @@
 
 - (NSDate*) dateSelected;
 - (NSDate*) monthDate;
-- (BOOL) selectDate:(NSDate*)date;
+- (BOOL) selectDate:(NSDate*)date userInfo:(NSDictionary *) dictionary;
 - (void) reload;
 
 - (CGFloat) maximumHeight;
@@ -79,7 +79,7 @@
  @param monthView The calendar month view.
  @param date The highlighted date.
  */
-- (void) calendarMonthView:(TKCalendarMonthView*)monthView didSelectDate:(NSDate*)date;
+- (void) calendarMonthView:(TKCalendarMonthView*)monthView didSelectDate:(NSDate*)date userInfo:(NSDictionary *) userInfo;
 
 
 /** The calendar should change the current month to grid shown.
