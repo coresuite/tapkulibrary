@@ -59,6 +59,7 @@
 @property (nonatomic, strong) NSArray *datesArray;
 @property (nonatomic, strong) NSMutableArray *accessibleElements;
 @property (nonatomic, strong) NSTimeZone *timeZone;
+@property (nonatomic, strong) NSArray *marks;
 
 - (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray *)markArray startOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone;
 - (void) setTarget:(id)target action:(SEL)action;

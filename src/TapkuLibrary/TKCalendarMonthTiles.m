@@ -62,6 +62,12 @@
 }
 @synthesize monthDate;
 @synthesize visibleDayRows;
+@synthesize marks;
+
+- (void) setMarks:(NSArray *)aMarks {
+    marks = aMarks;
+    [self setNeedsDisplay];
+}
 
 #pragma mark Accessibility Container methods
 
