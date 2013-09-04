@@ -271,6 +271,8 @@
     [super layoutSubviews];
     
     selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
+    BOOL hasDot = [[marks objectAtIndex: selectedBox.row * 7 + selectedBox.section] boolValue];
+	self.selectedImageView.dot.hidden = !hasDot;
 }
 
 - (void) drawRect:(CGRect)rect {
