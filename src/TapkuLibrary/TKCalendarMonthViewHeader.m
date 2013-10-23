@@ -54,7 +54,9 @@
     self = [super initWithFrame:frame];
     if (self) {
 		// bg
-		backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/topBar.png")]];
+        UIImage *headerImage= [[UIImage alloc] initWithCGImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")].CGImage  scale:1 orientation:UIImageOrientationDownMirrored];
+        UIImage *stretchedImage = [headerImage resizableImageWithCapInsets:UIEdgeInsetsMake(0.0f, 20.0f, 0.0f, 20.0f)];
+		backgroundView = [[UIImageView alloc] initWithImage:stretchedImage];
 		[self addSubview:backgroundView];
 		
 		// arrows
