@@ -336,6 +336,10 @@
 		i++;
 		index++;
 	}
+    
+    CGColorRelease(darkColor);
+    CGColorRelease(whiteColor);
+    CGColorSpaceRelease(myColorSpace);
 }
 
 - (BOOL) selectDay:(NSInteger)day{
