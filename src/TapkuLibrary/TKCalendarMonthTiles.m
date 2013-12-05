@@ -67,6 +67,7 @@
 - (void) setMarks:(NSArray *)aMarks {
     marks = aMarks;
     [self setNeedsDisplay];
+    [self setNeedsLayout];
 }
 
 #pragma mark Accessibility Container methods
