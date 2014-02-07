@@ -105,7 +105,8 @@
         [self addSubview:self.tileBox];
         [self addSubview:self.shadow];
         
-        self.backgroundColor = [UIColor grayColor];
+        UIColor *colorToBeUsed = [UIColor whiteColor];
+        self.backgroundColor = colorToBeUsed;
         
         self.header.titleView.text = [month monthYearStringWithTimeZone:tz];
         
@@ -330,7 +331,8 @@
 - (void) layoutSubviews {
     [super layoutSubviews];
     
-    CGFloat height = [TKCalendarMonthView effectiveTilesHeightForMonth:[self monthDate] timeZone:self.timeZone availableRect:self.bounds];
+    CGFloat heightCorrection = 1.0f;
+    CGFloat height = [TKCalendarMonthView effectiveTilesHeightForMonth:[self monthDate] timeZone:self.timeZone availableRect:self.bounds] + heightCorrection;
     CGFloat width = CGRectGetWidth(self.bounds);
     CGFloat shadowImageHeight = [shadow image].size.height;
     CGFloat tilesOffset = [TKTile tileStartOffsetForTilesWidth:self.bounds.size.width];
@@ -342,7 +344,7 @@
     tileBox.frame = CGRectMake(tilesOffset, [TKCalendarMonthView headerHeight], CGRectGetWidth(self.bounds), height);
     shadow.frame = CGRectMake(0, CGRectGetHeight(self.frame) - shadowImageHeight + outsideShadowHeight, width, shadowImageHeight);
     
-    currentTile.frame = CGRectMake(0.0f, 0.0f, width, height);
+    currentTile.frame = CGRectMake(0.0f, -heightCorrection, width, height);
 }
 
 - (TKCalendarMonthViewHeader *) header {

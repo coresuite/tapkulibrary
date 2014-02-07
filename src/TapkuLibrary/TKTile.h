@@ -16,7 +16,7 @@ typedef enum {
 	TKTileTypeDarken
 } TKTileType;
 
-@interface TKTile : UIImageView {
+@interface TKTile : UIImageView<UIAppearance> {
 	UILabel *dot;
 	UILabel *currentDay;
 }
@@ -24,15 +24,21 @@ typedef enum {
 @property (nonatomic, readonly) UILabel *dot;
 @property (nonatomic) CGSize shadowOffset;
 
-+ (void) drawTileInRect:(CGRect)r day:(NSInteger)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2  context:(CGContextRef)context;
++ (void) drawTileInRect:(CGRect)tileRect day:(NSInteger)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 context:(CGContextRef)context
+                isToday:(BOOL) isToday isOtherMonthDay:(BOOL)isOtherMonthDay;
 
 + (NSString *) stringFromDayNumber:(NSInteger) day;
 
-+ (UIImage *) imageForTileType:(TKTileType) tileType;
++ (UIImage *) imageForTileType:(TKTileType) tileType size:(CGSize)size;
 + (UIFont *) fontForDateLabelForTileRect:(CGRect) tileRect;
 + (UIFont *) fontForDotLabelForTileRect:(CGRect) tileRect;
 
 + (CGFloat) tileStartOffsetForTilesWidth:(CGFloat)tilesWidth;
 + (CGFloat) effectiveTileWidthForTilesWidth:(CGFloat)tilesWidth;
 
+- (void) setDayLabelTextColor:(UIColor *)textColor
+                 forTileType:(TKTileType)tileType UI_APPEARANCE_SELECTOR;
+- (void) setSelectionBgColor:(UIColor *)bgColor UI_APPEARANCE_SELECTOR;
+- (void) setDotColor:(UIColor *)dotColor UI_APPEARANCE_SELECTOR;
+- (void) setSeparatorColor:(UIColor *) sepColor UI_APPEARANCE_SELECTOR;
 @end

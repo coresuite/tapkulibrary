@@ -9,6 +9,8 @@
 #import "TKCalendarMonthViewHeader.h"
 #import "TKGlobal.h"
 
+#define isIOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+
 @implementation TKCalendarMonthViewHeader
 @synthesize leftArrow;
 @synthesize rightArrow;
@@ -56,18 +58,31 @@
 		// bg
         UIImage *headerImage= [[UIImage alloc] initWithCGImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")].CGImage  scale:1 orientation:UIImageOrientationDownMirrored];
         UIImage *stretchedImage = [headerImage resizableImageWithCapInsets:UIEdgeInsetsMake(0.0f, 20.0f, 0.0f, 20.0f)];
+        UIImage *rightArrowImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/calendar_right_arrow.png")];
+        UIImage *arrowImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/calendar_left_arrow.png")];
+        UIColor *daysColor = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
+        UIColor *titleColor = daysColor;
+        if (isIOS7) {
+            headerImage = [[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTileios7.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            stretchedImage = [headerImage resizableImageWithCapInsets:UIEdgeInsetsMake(2.0f, 0.0f, 2.0f, 0.0f)];
+            rightArrowImage = [rightArrowImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            arrowImage = [arrowImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            daysColor = [UIColor lightGrayColor];
+            titleColor = [[[UIApplication sharedApplication] delegate] window].tintColor;
+        }
+        
 		backgroundView = [[UIImageView alloc] initWithImage:stretchedImage];
 		[self addSubview:backgroundView];
 		
 		// arrows
 		rightArrow = [UIButton buttonWithType:UIButtonTypeCustom];
 		rightArrow.tag = 1;
-		[rightArrow setImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/calendar_right_arrow.png")] forState:0];
+		[rightArrow setImage:rightArrowImage forState:0];
 		[self addSubview:rightArrow];
 		
 		leftArrow = [UIButton buttonWithType:UIButtonTypeCustom];
 		leftArrow.tag = 0;
-		[leftArrow setImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/calendar_left_arrow.png")] forState:0];
+		[leftArrow setImage:arrowImage forState:0];
 		[self addSubview:leftArrow];
 		
 		// title
@@ -75,7 +90,7 @@
 		titleView.textAlignment = UITextAlignmentCenter;
 		titleView.backgroundColor = [UIColor clearColor];
 		titleView.font = [UIFont boldSystemFontOfSize:22];
-		titleView.textColor = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
+		titleView.textColor = titleColor;
 		[self addSubview:titleView];
 		
 		NSMutableArray *dayLabelsTmp = [[NSMutableArray alloc] initWithCapacity:7];
@@ -87,7 +102,7 @@
 			label.shadowOffset = CGSizeMake(0, 1);
 			label.font = [UIFont systemFontOfSize:11];
 			label.backgroundColor = [UIColor clearColor];
-			label.textColor = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
+			label.textColor = daysColor;
 			[dayLabelsTmp addObject:label];
 			[self addSubview:label];
 		}

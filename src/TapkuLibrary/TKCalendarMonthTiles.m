@@ -35,6 +35,8 @@
 #import "NSDate+TKCategory.h"
 #import <objc/message.h>
 
+#define isIOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+
 @interface NSArray(TKCalendarExtensions)
 - (BOOL) isMarkAtIndex:(NSUInteger) index;
 @end
@@ -215,6 +217,10 @@
                                                                                     topCapHeight:floorf(grayGradientImage.size.height/2)];
         gradientColor = [UIColor colorWithPatternImage:gradientImageStreched];
 		grayGradientColor = [UIColor colorWithPatternImage:grayGradientImageStreched];
+        if (isIOS7) {
+            gradientColor = [UIColor whiteColor];
+            grayGradientColor = [UIColor whiteColor];
+        }
         
         self.contentMode = UIViewContentModeRedraw;
         self.timeZone = timeZone;
@@ -272,6 +278,9 @@
     [super layoutSubviews];
     
     selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
+    if (isIOS7) {
+        selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected size:selectedImageView.frame.size];
+    }
     BOOL hasDot = [[marks objectAtIndex: selectedBox.row * 7 + selectedBox.section] boolValue];
 	self.selectedImageView.dot.hidden = !hasDot;
 }
@@ -280,7 +289,7 @@
     CGFloat tileHeight = [self tileHeight];
     
 	CGContextRef context = UIGraphicsGetCurrentContext();
-	UIImage *tile = [TKTile imageForTileType:TKTileTypeNotSelected];
+	UIImage *tile = [TKTile imageForTileType:TKTileTypeNotSelected size:CGSizeMake(self.tileWidth, tileHeight)];
 	CGRect r = CGRectMake(0, 0, self.tileWidth, tileHeight);
 	CGContextDrawTiledImage(context, r, tile.CGImage);
 	UIFont *dateFont = [TKTile fontForDateLabelForTileRect:r];
@@ -291,7 +300,9 @@
 		int index = today +  pre-1;
 		CGRect r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
 		r.origin.y += 0.0f;
-		[[TKTile imageForTileType:TKTileTypeToday] drawInRect:r];
+        if (!isIOS7) {
+            [[TKTile imageForTileType:TKTileTypeToday size:CGSizeMake(self.tileWidth, tileHeight)] drawInRect:r];
+        }
 	}
 	
     float myColorValues[] = {1, 1, 1, .8};
@@ -308,7 +319,7 @@
 		[color set];
 		for(int i = firstOfPrev;i<= lastOfPrev;i++){
 			r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
-			[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context];
+			[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context isToday:NO isOtherMonthDay:YES];
 			index++;
 		}
 	}
@@ -318,13 +329,17 @@
 	for(int i=1; i <= daysInMonth; i++){
 		r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
 		if(today == i) {
-            CGContextSetShadowWithColor(context, CGSizeMake(0,-1), 0, darkColor);
-			[[UIColor whiteColor] set];
+            if (!isIOS7) {
+                CGContextSetShadowWithColor(context, CGSizeMake(0,-1), 0, darkColor);
+                [[UIColor whiteColor] set];
+            }
         }
-		[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context];
+		[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context isToday:today == i isOtherMonthDay:NO];
 		if(today == i){
-			CGContextSetShadowWithColor(context, CGSizeMake(0,1), 0, whiteColor);
-			[color set];
+            if (!isIOS7) {
+                CGContextSetShadowWithColor(context, CGSizeMake(0,1), 0, whiteColor);
+                [color set];
+            }
 		}
 		index++;
 	}
@@ -333,7 +348,7 @@
 	NSInteger i = 1;
 	while(index % 7 != 0){
 		r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
-		[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context];
+		[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context isToday:NO isOtherMonthDay:YES];
 		i++;
 		index++;
 	}
@@ -355,11 +370,11 @@
 	
 	if(day == today){
 		self.selectedImageView.shadowOffset = CGSizeMake(0, -1);
-		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelectedToday];
+		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelectedToday size:self.selectedImageView.frame.size];
 		markWasOnToday = YES;
 	} else if (markWasOnToday) {
 		self.selectedImageView.shadowOffset = CGSizeMake(0, -1);
-		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected];
+		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected size:self.selectedImageView.frame.size];
 		markWasOnToday = NO;
 	}
 	
@@ -418,16 +433,18 @@
 	}
 	
 	if(portion != 1){
-		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeDarken];
+		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeDarken size:self.selectedImageView.frame.size];
         self.selectedImageView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.15];
 		markWasOnToday = YES;
 	} else if(portion==1 && day == today) {
 		self.selectedImageView.shadowOffset = CGSizeMake(0, -1);
-		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelectedToday];
+		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelectedToday size:self.selectedImageView.frame.size];
+        self.selectedImageView.backgroundColor = [UIColor clearColor];
 		markWasOnToday = YES;
 	} else if(markWasOnToday) {
 		self.selectedImageView.shadowOffset = CGSizeMake(0, -1);
-		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected];
+		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected size:self.selectedImageView.frame.size];
+        self.selectedImageView.backgroundColor = [UIColor clearColor];
 		markWasOnToday = NO;
 	}
 	if ([self.selectedImageView superview] == nil) {
@@ -466,7 +483,7 @@
 	if(selectedImageView==nil){
 		selectedImageView = [[TKTile alloc] initWithFrame:CGRectZero];
         selectedImageView.layer.magnificationFilter = kCAFilterNearest;
-		selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected];
+		selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected size:selectedImageView.frame.size];
 	}
 	return selectedImageView;
 }

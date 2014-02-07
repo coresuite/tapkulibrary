@@ -13,7 +13,33 @@
 //#define dotFontSize 18.0
 //#define dateFontSize 22.0
 
+#define isIOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+#define IS_WIDESCREEN (fabs((double)[[UIScreen mainScreen] bounds].size.height - (double)568) < DBL_EPSILON)
+
+static NSString * const separatorColorKey = @"sepColor";
+static NSString * const dotColor = @"dotColor";
+static NSString * const selectionBgColor = @"bgColor";
 static NSString * const dotStirng = @"•";
+static NSMutableDictionary *appearanceInfo = nil;
+static void correctYofLabelForIOS7(CGRect *dayRect, BOOL invert) {
+    if (isIOS7) {
+        if (invert) {
+            dayRect->origin.y = dayRect->origin.y + 4.0f;
+        } else {
+            dayRect->origin.y = dayRect->origin.y - 4.0f;
+        }
+    }
+}
+
+static void correctYofDotForIOS7(CGRect *dotRect, BOOL invert) {
+    if (isIOS7) {
+        if (invert) {
+            dotRect->origin.y = dotRect->origin.y - 4.0f;
+        } else {
+            dotRect->origin.y = dotRect->origin.y + 4.0f;
+        }
+    }
+}
 
 static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont, NSString *dotText) {
 	CGFloat dotHeight = dotFont.lineHeight;
@@ -60,7 +86,13 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 		dot.textAlignment = UITextAlignmentCenter;
 		dot.shadowColor = [UIColor darkGrayColor];
 		dot.shadowOffset = CGSizeMake(0, -1);
-		[self addSubview:dot];
+        if (!isIOS7) {
+            [self addSubview:dot];
+        }
+        
+        if (appearanceInfo == nil) {
+            appearanceInfo = [[NSMutableDictionary alloc] init];
+        }
 	}
 	return self;
 }
@@ -78,6 +110,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 	
 	// label
 	CGRect rectForDay = [TKTile rectForLabelForTileRect:r labelFont:currentDay.font];
+    correctYofLabelForIOS7(&rectForDay, NO);
 	currentDay.frame = rectForDay;
 	
 	// dot
@@ -93,7 +126,9 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     return [formatter stringFromNumber:@(day)];
 }
 
-+ (void) drawTileInRect:(CGRect)tileRect day:(NSInteger)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 context:(CGContextRef)context {
++ (void) drawTileInRect:(CGRect)tileRect day:(NSInteger)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 context:(CGContextRef)context
+                isToday:(BOOL) isToday isOtherMonthDay:(BOOL)isOtherMonthDay
+{
 	NSString *str = [TKTile stringFromDayNumber:day];
 	
 	CGRect r = [TKTile rectForLabelForTileRect:tileRect labelFont:f1];
@@ -102,16 +137,36 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     if (r.size.height >= 27.0f) {
         heightCorrection = 4;
     }
-    CGContextSetPatternPhase(context, CGSizeMake(r.origin.x, r.origin.y + heightCorrection));
+    if (!isIOS7) {
+        CGContextSetPatternPhase(context, CGSizeMake(r.origin.x, r.origin.y + heightCorrection));
+    } else {
+        TKTileType type = TKTileTypeNotSelected;
+        
+        if (isToday) {
+            type = TKTileTypeToday;
+        } else if (isOtherMonthDay) {
+            type = TKTileTypeDarken;
+        }
+        UIColor *fillColor = [appearanceInfo objectForKey:[NSString stringWithFormat:@"%d", type]];
+        CGContextSetFillColorWithColor(context, fillColor.CGColor);
+    }
     
+    correctYofLabelForIOS7(&r, NO);
 	[str drawInRect: r
 		   withFont: f1
 	  lineBreakMode: UILineBreakModeWordWrap 
 		  alignment: UITextAlignmentCenter];
+    correctYofLabelForIOS7(&r, YES);
 	
 	if(mark){
 		convertDateLabelRectToDotRect(&r, f2, dotStirng);
-		
+		correctYofDotForIOS7(&r, NO);
+        
+        if (isIOS7) {
+            UIColor *dot = [appearanceInfo objectForKey:dotColor];
+            CGContextSetFillColorWithColor(context, dot.CGColor);
+        }
+        
 		[dotStirng drawInRect:r
 				withFont: f2
 		   lineBreakMode: UILineBreakModeWordWrap 
@@ -151,7 +206,25 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     return effectiveTileWidth;
 }
 
-+ (UIImage *) imageForTileType:(TKTileType) tileType {
++ (UIImage *) iOS7imageForTileType:(TKTileType) tileType size:(CGSize) size {
+    UIImage *imageToReturn = [TKTile dayBackgroundImageWithSelectionOval:NO size:size];
+	if (tileType == TKTileTypeSelected) {
+        imageToReturn = [TKTile dayBackgroundImageWithSelectionOval:YES size:size];
+	} else if (tileType == TKTileTypeSelectedToday) {
+		imageToReturn = [TKTile dayBackgroundImageWithSelectionOval:YES size:size];
+	} else if (tileType == TKTileTypeDarken) {
+		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile Gray.png")];
+	} else if(tileType == TKTileTypeToday) {
+		imageToReturn = [TKTile dayBackgroundImageWithSelectionOval:NO size:size];
+	}
+    return imageToReturn;
+}
+
++ (UIImage *) imageForTileType:(TKTileType) tileType size:(CGSize) size {
+    if (isIOS7) {
+        return [TKTile iOS7imageForTileType:tileType size:size];
+    }
+    
 	UIImage *imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")]; // not selected
 	if (tileType == TKTileTypeSelected) {
         NSString *path = TKBUNDLE(@"calendar/dateTileSelected.png");
@@ -192,4 +265,54 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     NSString *s = [totalDesc stringByAppendingFormat:@"hidden: %@, alpha: %f, image: %@", self.hidden ? @"YES" : @"NO", self.alpha, self.image];
     return s;
 }
+
+#pragma mark - Appearance
+
+- (void) setDotColor:(UIColor *)color {
+    [appearanceInfo setObject:color forKey:dotColor];
+}
+
+- (void) setSelectionBgColor:(UIColor *)bgColor {
+    [appearanceInfo setValue:bgColor forKey:selectionBgColor];
+}
+
+- (void) setDayLabelTextColor:(UIColor *)textColor forTileType:(TKTileType)tileType  {
+    [appearanceInfo setValue:textColor forKey:[NSString stringWithFormat:@"%d", tileType]];
+}
+
+- (void) setSeparatorColor:(UIColor *) sepColor {
+    [appearanceInfo setObject:sepColor forKey:separatorColorKey];
+}
+
+#pragma mark - iOS7 image generation
+
++ (UIImage *) dayBackgroundImageWithSelectionOval:(BOOL)selectionDrawn size:(CGSize)size {
+    if (ABS(size.height) <= 0.001 || ABS(size.width) <= 0.001) {
+        return nil;
+    }
+    CGFloat tileWidth = size.width;
+    CGFloat tileHeight = size.height;
+    
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(tileWidth, tileHeight), NO, 0.0f);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    if (!selectionDrawn) {
+        CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+        CGContextFillRect(context, CGRectMake(0.0f, 0.0f, tileWidth, tileHeight));
+        UIColor *separatorColor = [appearanceInfo objectForKey:separatorColorKey];
+        CGContextSetStrokeColorWithColor(context,  separatorColor.CGColor);
+        CGContextStrokeRectWithWidth(context, CGRectMake(0.0f, tileHeight, tileWidth, 1.0f), 1.0f);
+    }
+    if (selectionDrawn) {
+        UIColor *bgColor = [appearanceInfo objectForKey:selectionBgColor];
+        CGContextSetFillColorWithColor(context, bgColor.CGColor);
+        CGFloat selectionWidth = floorf(tileWidth / 1.54f); // adjusted propotionally to the size of the tile (iPhone/iPad)
+        CGFloat yOffset = floorf(tileWidth / 21.0f);        // adjusted propotionally to the size of the tile (iPhone/iPad)
+        CGRect rectForOval = CGRectIntegral(CGRectMake((tileWidth - selectionWidth) / 2.0f, yOffset, selectionWidth, selectionWidth));
+        CGContextFillEllipseInRect(context, rectForOval);
+    }
+    UIImage *bgImage = UIGraphicsGetImageFromCurrentImageContext();
+	UIGraphicsEndImageContext();
+    return bgImage;
+}
+
 @end
