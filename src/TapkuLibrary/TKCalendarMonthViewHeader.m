@@ -71,7 +71,7 @@
             rightArrowImage = [rightArrowImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
             arrowImage = [arrowImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
             daysColor = [UIColor lightGrayColor];
-            titleColor = [[[UIApplication sharedApplication] delegate] window].tintColor;
+            titleColor = [[[[UIApplication sharedApplication] delegate] window] valueForKeyPath:@"tintColor"];
         }
         
 		backgroundView = [[UIImageView alloc] initWithImage:stretchedImage];
