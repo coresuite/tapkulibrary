@@ -10,6 +10,7 @@
 #import "TKGlobal.h"
 
 #define isIOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+#define CSIOS7UIImageRenderingModeAlwaysTemplate 2
 
 @implementation TKCalendarMonthViewHeader
 @synthesize leftArrow;
@@ -63,10 +64,12 @@
         UIColor *daysColor = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
         UIColor *titleColor = daysColor;
         if (isIOS7) {
-            headerImage = [[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTileios7.png")] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            headerImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTileios7.png")];
+            headerImage = [headerImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
+            
             stretchedImage = [headerImage resizableImageWithCapInsets:UIEdgeInsetsMake(2.0f, 0.0f, 2.0f, 0.0f)];
-            rightArrowImage = [rightArrowImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-            arrowImage = [arrowImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            rightArrowImage = [rightArrowImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
+            arrowImage = [arrowImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
             daysColor = [UIColor lightGrayColor];
             titleColor = [[[UIApplication sharedApplication] delegate] window].tintColor;
         }
