@@ -191,4 +191,9 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 	return [UIFont boldSystemFontOfSize:floorf(tileheight / 2.5f)];
 }
 
+- (NSString *) description {
+    NSString *totalDesc = [super description];
+    NSString *s = [totalDesc stringByAppendingFormat:@"hidden: %@, alpha: %f, image: %@", self.hidden ? @"YES" : @"NO", self.alpha, self.image];
+    return s;
+}
 @end

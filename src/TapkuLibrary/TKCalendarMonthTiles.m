@@ -250,7 +250,7 @@
         visibleDayRows = rows;
         
         self.multipleTouchEnabled = NO;
-        
+        [self addSubview:self.selectedImageView];
         return self;
     }
     return self;
@@ -424,8 +424,9 @@
 		self.selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected];
 		markWasOnToday = NO;
 	}
-	
-	[self addSubview:self.selectedImageView];
+	if ([self.selectedImageView superview] == nil) {
+        [self addSubview:self.selectedImageView];
+    }
 	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:day];
 	self.selectedImageView.dot.hidden = ![[marks objectAtIndex: row * 7 + column] boolValue];
 	
@@ -433,8 +434,6 @@
     [self setNeedsLayout];
 	
 	if (day == selectedDay && selectedPortion == portion) return;
-	
-	
 	
 	if (portion == 1){
 		selectedDay = day;
