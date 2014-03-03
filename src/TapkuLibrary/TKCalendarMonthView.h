@@ -48,6 +48,7 @@
 }
 @property (nonatomic, strong) NSTimeZone *timeZone;
 @property (nonatomic)   TKCalendarMonthViewHeader *header;
+@property (nonatomic, strong, readonly) TKCalendarMonthTiles *oldTile;
 @property (nonatomic,weak) id <TKCalendarMonthViewDelegate> delegate;
 @property (nonatomic,weak) id <TKCalendarMonthViewDataSource> dataSource;
 @property (nonatomic,weak) id <TKCalendarMonthViewSizeDelegate> sizeDelegate;
@@ -66,6 +67,8 @@
 + (CGFloat) headerHeight;
 + (NSUInteger) rowsForMonth:(NSDate *) date;
 + (NSUInteger) rowsForMonth:(NSDate *) date timeZone:(NSTimeZone *) timeZone;
++ (CGFloat) effectiveTilesHeightForMonth:(NSDate *) month availableRect:(CGRect) rect;
++ (CGFloat) effectiveTilesHeightForMonth:(NSDate *) month timeZone:(NSTimeZone *)tz availableRect:(CGRect) rect;
 @end
 
 

@@ -123,7 +123,7 @@
 
 - (CGRect) rectForTileAtIndexPath:(NSIndexPath *) indexPath {
 	CGFloat x = (indexPath.section * self.tileWidth);
-	CGFloat y = (indexPath.row * self.tileHeight)-1;
+	CGFloat y = (indexPath.row * self.tileHeight);
     return CGRectMake(x, y, self.tileWidth, self.tileHeight);
 }
 
@@ -369,7 +369,7 @@
 		row--;
 	}
     selectedBox = [NSIndexPath indexPathForRow:row inSection:column];
-	self.selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
+    [self setNeedsLayout];
     return hasDot;
 }
 
@@ -430,7 +430,7 @@
 	self.selectedImageView.dot.hidden = ![[marks objectAtIndex: row * 7 + column] boolValue];
 	
     selectedBox = [NSIndexPath indexPathForRow:row inSection:column];
-	self.selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
+    [self setNeedsLayout];
 	
 	if (day == selectedDay && selectedPortion == portion) return;
 	

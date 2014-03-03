@@ -45,9 +45,21 @@
 @synthesize delegate, dataSource, sizeDelegate;
 @synthesize header;
 @synthesize timeZone;
+@synthesize oldTile;
 
 + (CGFloat) headerHeight {
     return 44.0f;
+}
+
++ (CGFloat) effectiveTilesHeightForMonth:(NSDate *) month availableRect:(CGRect) rect {
+    return [TKCalendarMonthView effectiveTilesHeightForMonth:month timeZone:[NSTimeZone defaultTimeZone] availableRect:rect];
+}
+
++ (CGFloat) effectiveTilesHeightForMonth:(NSDate *) month timeZone:(NSTimeZone *)tz availableRect:(CGRect) rect {
+    NSInteger rows = [TKCalendarMonthView rowsForMonth:month timeZone:tz];
+    CGFloat tileWidth = [TKTile effectiveTileWidthForTilesWidth:CGRectGetWidth(rect)];
+    CGFloat height = tileWidth * rows;
+    return height;
 }
 
 + (NSUInteger) rowsForMonth:(NSDate *) date {
@@ -150,8 +162,9 @@
 	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:nextMonth startOnSunday:sunday timeZone:self.timeZone];
 	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
     
-    // TODO correct frame
-    TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:nextMonth marks:ar startOnSunday:sunday timeZone:self.timeZone];
+    CGRect rect = [currentTile frame];
+    rect.size.height = [TKCalendarMonthView effectiveTilesHeightForMonth:nextMonth timeZone:self.timeZone availableRect:self.bounds];
+    TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:rect month:nextMonth marks:ar startOnSunday:sunday timeZone:self.timeZone];
 	[newTile setTarget:self action:@selector(tile:)];
 	
 	int overlap =  0;
@@ -191,8 +204,10 @@
 		currentTile.frame = CGRectMake(0,  newTile.frame.size.height - overlap, currentTile.frame.size.width, currentTile.frame.size.height);
 	}
 	self.shadow.frame = CGRectMake(0, self.frame.size.height-self.shadow.frame.size.height+outsideShadowHeight, self.shadow.frame.size.width, self.shadow.frame.size.height);
-	
-	[self.sizeDelegate calendarMonthView:self willAnimateToFrame:newTile.frame animationDuration:animationDuration];
+    
+    CGRect freshFrame = newTile.frame;
+    freshFrame.size.height += [TKCalendarMonthView headerHeight];
+	[self.sizeDelegate calendarMonthView:self willAnimateToFrame:freshFrame animationDuration:animationDuration];
 	
 	[UIView commitAnimations];
 	
@@ -265,8 +280,9 @@
 		NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:month startOnSunday:sunday timeZone:self.timeZone];
 		NSArray *data = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
         
-        // TODO correct frame
-        TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:[currentTile frame] month:month marks:data startOnSunday:sunday timeZone:self.timeZone];
+        CGRect rect = [currentTile frame];
+        rect.size.height = [TKCalendarMonthView effectiveTilesHeightForMonth:month timeZone:self.timeZone availableRect:self.bounds];
+        TKCalendarMonthTiles *newTile = [[TKCalendarMonthTiles alloc] initWithFrame:rect month:month marks:data startOnSunday:sunday timeZone:self.timeZone];
 		[newTile setTarget:self action:@selector(tile:)];
 		[currentTile removeFromSuperview];
 		currentTile = newTile;
@@ -344,8 +360,7 @@
 - (void) layoutSubviews {
     [super layoutSubviews];
     
-    int rows = [TKCalendarMonthView rowsForMonth:[currentTile monthDate]];
-    CGFloat height = [TKTile effectiveTileWidthForTilesWidth:CGRectGetWidth(self.bounds)] * rows;
+    CGFloat height = [TKCalendarMonthView effectiveTilesHeightForMonth:[self monthDate] timeZone:self.timeZone availableRect:self.bounds];
     CGFloat width = CGRectGetWidth(self.bounds);
     CGFloat shadowImageHeight = [shadow image].size.height;
     CGFloat tilesOffset = [TKTile tileStartOffsetForTilesWidth:self.bounds.size.width];
