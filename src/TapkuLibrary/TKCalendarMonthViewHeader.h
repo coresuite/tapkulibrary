@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface TKCalendarMonthViewHeader : UIView {
+@interface TKCalendarMonthViewHeader : UIView <UIAppearance> {
 	UIImageView *backgroundView;
 	UIButton *leftArrow;
 	UIButton *rightArrow;
@@ -27,5 +27,9 @@
 @property (nonatomic, readonly) UILabel *titleView;
 @property (nonatomic)           UIView  *accessoryView;
 @property (nonatomic) UIImage *backgroundImage;
+
+- (void) setBackgroundViewColor:(UIColor *)bkgColor UI_APPEARANCE_SELECTOR;
+- (void) setTitleColor:(UIColor *)titleColor UI_APPEARANCE_SELECTOR;
+
 
 @end

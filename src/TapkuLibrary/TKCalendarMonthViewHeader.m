@@ -145,6 +145,17 @@
 	backgroundView.frame = self.bounds;
 }
 
+- (void) setBackgroundViewColor:(UIColor *)bkgColor {
+    backgroundView.image = nil;
+    backgroundView.backgroundColor = bkgColor;
+}
 
+- (void) setTitleColor:(UIColor *)titleColor {
+    titleView.textColor = titleColor;
+    for (UILabel *dayLabel in dayLabels) {
+        dayLabel.textColor = titleColor;
+        dayLabel.shadowOffset = CGSizeMake(0, 0);
+    }
+}
 
 @end
