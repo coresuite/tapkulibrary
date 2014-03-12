@@ -59,20 +59,8 @@
 		// bg
         UIImage *headerImage= [[UIImage alloc] initWithCGImage:[UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")].CGImage  scale:1 orientation:UIImageOrientationDownMirrored];
         UIImage *stretchedImage = [headerImage resizableImageWithCapInsets:UIEdgeInsetsMake(0.0f, 20.0f, 0.0f, 20.0f)];
-        UIImage *rightArrowImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/calendar_right_arrow.png")];
-        UIImage *arrowImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/calendar_left_arrow.png")];
         UIColor *daysColor = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
         UIColor *titleColor = daysColor;
-        if (isIOS7) {
-            headerImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTileios7.png")];
-            headerImage = [headerImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
-            
-            stretchedImage = [headerImage resizableImageWithCapInsets:UIEdgeInsetsMake(2.0f, 0.0f, 2.0f, 0.0f)];
-            rightArrowImage = [rightArrowImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
-            arrowImage = [arrowImage performSelector:NSSelectorFromString(@"imageWithRenderingMode:") withObject:[NSNumber numberWithInteger:CSIOS7UIImageRenderingModeAlwaysTemplate]];
-            daysColor = [UIColor lightGrayColor];
-            titleColor = [[[[UIApplication sharedApplication] delegate] window] valueForKeyPath:@"tintColor"];
-        }
         
 		backgroundView = [[UIImageView alloc] initWithImage:stretchedImage];
 		[self addSubview:backgroundView];
@@ -80,12 +68,10 @@
 		// arrows
 		rightArrow = [UIButton buttonWithType:UIButtonTypeCustom];
 		rightArrow.tag = 1;
-		[rightArrow setImage:rightArrowImage forState:0];
 		[self addSubview:rightArrow];
 		
 		leftArrow = [UIButton buttonWithType:UIButtonTypeCustom];
 		leftArrow.tag = 0;
-		[leftArrow setImage:arrowImage forState:0];
 		[self addSubview:leftArrow];
 		
 		// title
@@ -156,6 +142,14 @@
         dayLabel.textColor = titleColor;
         dayLabel.shadowOffset = CGSizeMake(0, 0);
     }
+}
+
+- (void) setRightArrowImage:(UIImage *)rightArrowImage {
+    [rightArrow setImage:rightArrowImage forState:UIControlStateNormal];
+}
+
+- (void) setLeftArrowImage:(UIImage *)leftArrowImage {
+    [leftArrow setImage:leftArrowImage forState:UIControlStateNormal];
 }
 
 @end
