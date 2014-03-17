@@ -89,7 +89,7 @@
 			label.textAlignment = UITextAlignmentCenter;
 			label.shadowColor = [UIColor whiteColor];
 			label.shadowOffset = CGSizeMake(0, 1);
-			label.font = [UIFont systemFontOfSize:11];
+			label.font = [UIFont systemFontOfSize:10];
 			label.backgroundColor = [UIColor clearColor];
 			label.textColor = daysColor;
 			[dayLabelsTmp addObject:label];
@@ -150,6 +150,11 @@
 
 - (void) setLeftArrowImage:(UIImage *)leftArrowImage {
     [leftArrow setImage:leftArrowImage forState:UIControlStateNormal];
+}
+
+- (void) setTitleFontAttributes:(NSDictionary *)titleAttributes {
+    UIFont *fontName = [titleAttributes objectForKey:NSFontAttributeName];
+    titleView.font = fontName;
 }
 
 @end

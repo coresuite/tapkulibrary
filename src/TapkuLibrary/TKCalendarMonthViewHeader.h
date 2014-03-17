@@ -32,5 +32,6 @@
 - (void) setTitleColor:(UIColor *)titleColor UI_APPEARANCE_SELECTOR;
 - (void) setRightArrowImage:(UIImage *)rightArrowImage UI_APPEARANCE_SELECTOR;
 - (void) setLeftArrowImage:(UIImage *)leftArrowImage UI_APPEARANCE_SELECTOR;
+- (void) setTitleFontAttributes:(NSDictionary *)titleAttributes UI_APPEARANCE_SELECTOR;
 
 @end
