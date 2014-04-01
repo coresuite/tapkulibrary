@@ -25,6 +25,7 @@
 @property (nonatomic, readonly) UIButton *leftArrow;
 @property (nonatomic, readonly) UIButton *rightArrow;
 @property (nonatomic, readonly) UILabel *titleView;
+@property (nonatomic, readonly) UIView  *horizontalSeparator;
 @property (nonatomic)           UIView  *accessoryView;
 @property (nonatomic) UIImage *backgroundImage;
 

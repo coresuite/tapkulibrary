@@ -57,8 +57,8 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 @synthesize dot;
 
 - (void) setShadowOffset:(CGSize) newOffset {
-	currentDay.shadowOffset = newOffset;
-	dot.shadowOffset = newOffset;
+//	currentDay.shadowOffset = newOffset;
+//	dot.shadowOffset = newOffset;
 }
 
 - (CGSize) shadowOffset {
@@ -74,8 +74,8 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 		currentDay.backgroundColor = [UIColor clearColor];
 		currentDay.font = [TKTile fontForDateLabelForTileRect:frame];
 		currentDay.textAlignment = UITextAlignmentCenter;
-		currentDay.shadowColor = [UIColor darkGrayColor];
-		currentDay.shadowOffset = CGSizeMake(0, -1);
+//		currentDay.shadowColor = [UIColor darkGrayColor];
+//		currentDay.shadowOffset = CGSizeMake(0, -1);
 		[self addSubview:currentDay];
 		
 		dot = [[UILabel alloc] initWithFrame:self.bounds];
@@ -84,8 +84,8 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 		dot.backgroundColor = [UIColor clearColor];
 		dot.font = [TKTile fontForDotLabelForTileRect:frame];
 		dot.textAlignment = UITextAlignmentCenter;
-		dot.shadowColor = [UIColor darkGrayColor];
-		dot.shadowOffset = CGSizeMake(0, -1);
+//		dot.shadowColor = [UIColor darkGrayColor];
+//		dot.shadowOffset = CGSizeMake(0, -1);
         if (!isIOS7) {
             [self addSubview:dot];
         }

@@ -96,12 +96,20 @@
 			[self addSubview:label];
 		}
 		dayLabels = dayLabelsTmp;
+        
+        _horizontalSeparator = [[UIView alloc] init];
+        _horizontalSeparator.backgroundColor = [UIColor grayColor];
+        [self addSubview:_horizontalSeparator];
     }
     return self;
 }
 
 - (void) layoutSubviews {
 	[super layoutSubviews];
+    
+    CGFloat separatorThickness = [[UIScreen mainScreen] scale] == 2.00 ? 0.5f : 1.0f;
+    
+    _horizontalSeparator.frame = CGRectMake(0.0f, CGRectGetMaxY(self.frame) - separatorThickness, CGRectGetWidth(self.bounds), separatorThickness);
 
 	CGFloat arrowsY = 48.0f;
 	CGFloat fCalendarHeaderComponentsHeight = 38.0f;
