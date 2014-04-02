@@ -165,4 +165,8 @@
     titleView.font = fontName;
 }
 
+- (void) setAccessoryViewColor:(UIColor *)color {
+    accessoryView.tintColor = color;
+}
+
 @end
