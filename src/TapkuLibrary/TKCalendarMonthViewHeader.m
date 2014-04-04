@@ -166,7 +166,9 @@
 }
 
 - (void) setAccessoryViewColor:(UIColor *)color {
-    accessoryView.tintColor = color;
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+        [accessoryView setValue:color forKeyPath:@"tintColor"];
+    }
 }
 
 @end
