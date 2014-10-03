@@ -267,9 +267,9 @@
 	action = a;
 }
 
-- (CGRect) rectForCellAtIndex:(int)index tileWidth:(CGFloat) width tileHeight:(CGFloat) height {
-	int row = index / 7;
-	int col = index % 7;
+- (CGRect) rectForCellAtIndex:(NSInteger)index tileWidth:(CGFloat) width tileHeight:(CGFloat) height {
+	NSInteger row = index / 7;
+	NSInteger col = index % 7;
 	
 	return CGRectMake(col * width, row * height, width, height);
 }
@@ -296,8 +296,8 @@
 	UIFont *dotFont =[TKTile fontForDotLabelForTileRect:r];
 	
 	if(today > 0){
-		int pre = firstOfPrev > 0 ? lastOfPrev - firstOfPrev + 1 : 0;
-		int index = today +  pre-1;
+		NSInteger pre = firstOfPrev > 0 ? lastOfPrev - firstOfPrev + 1 : 0;
+		NSInteger index = today +  pre-1;
 		CGRect r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
 		r.origin.y += 0.0f;
         if (!isIOS7) {
@@ -305,19 +305,19 @@
         }
 	}
 	
-    float myColorValues[] = {1, 1, 1, .8};
+    CGFloat myColorValues[] = {1, 1, 1, .8};
     CGColorSpaceRef myColorSpace = CGColorSpaceCreateDeviceRGB();
     CGColorRef whiteColor = CGColorCreate(myColorSpace, myColorValues);
 	CGContextSetShadowWithColor(context, CGSizeMake(0,1), 0, whiteColor);
     
-	float darkColorValues[] = {0, 0, 0, .5};
+	CGFloat darkColorValues[] = {0, 0, 0, .5};
     CGColorRef darkColor = CGColorCreate(myColorSpace, darkColorValues);
     
-    int index = 0;
+    NSInteger index = 0;
 	UIColor *color = grayGradientColor;
 	if(firstOfPrev > 0){
 		[color set];
-		for(int i = firstOfPrev;i<= lastOfPrev;i++){
+		for(NSInteger i = firstOfPrev;i<= lastOfPrev;i++){
 			r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
 			[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context isToday:NO isOtherMonthDay:YES];
 			index++;
@@ -326,7 +326,7 @@
 	
 	color = gradientColor;
 	[color set];
-	for(int i=1; i <= daysInMonth; i++){
+	for(NSInteger i=1; i <= daysInMonth; i++){
 		r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
 		if(today == i) {
             if (!isIOS7) {
@@ -359,11 +359,11 @@
 }
 
 - (BOOL) selectDay:(NSInteger)day{
-	int pre = firstOfPrev < 0 ?  0 : lastOfPrev - firstOfPrev + 1;
+	NSInteger pre = firstOfPrev < 0 ?  0 : lastOfPrev - firstOfPrev + 1;
 	
-	int tot = day + pre;
-	int row = tot / 7;
-	int column = (tot % 7)-1;
+	NSInteger tot = day + pre;
+	NSInteger row = tot / 7;
+	NSInteger column = (tot % 7)-1;
 	
 	selectedDay = day;
 	selectedPortion = 1;

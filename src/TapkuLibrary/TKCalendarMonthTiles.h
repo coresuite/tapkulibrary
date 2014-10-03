@@ -39,21 +39,21 @@
 	id __weak target;
 	SEL action;
 	
-	int firstOfPrev,lastOfPrev;
+	NSInteger firstOfPrev,lastOfPrev;
 	NSArray *marks;
-	int today;
+	NSInteger today;
 	BOOL markWasOnToday;
 	
-	int selectedDay,selectedPortion;
+	NSInteger selectedDay,selectedPortion;
 	
-	int firstWeekday, daysInMonth;
+	NSInteger firstWeekday, daysInMonth;
 	TKTile *selectedImageView;
 	BOOL startOnSunday;
 	NSDate *monthDate;
-    int visibleDayRows;
+    NSInteger visibleDayRows;
     NSIndexPath *selectedBox;
 }
-@property (readonly) int visibleDayRows;
+@property (readonly) NSInteger visibleDayRows;
 @property (readonly) NSDate *monthDate;
 @property (readonly) TKTile *selectedImageView;
 @property (nonatomic, strong) NSArray *datesArray;
@@ -64,7 +64,7 @@
 - (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray *)markArray startOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone;
 - (void) setTarget:(id)target action:(SEL)action;
 
-- (BOOL) selectDay:(int)day;
+- (BOOL) selectDay:(NSInteger)day;
 - (NSDate *) dateSelected;
 
 + (NSArray *) rangeOfDatesInMonthGrid:(NSDate*)date startOnSunday:(BOOL)sunday;
