@@ -9,7 +9,6 @@
 #import "TKCalendarMonthViewHeader.h"
 #import "TKGlobal.h"
 
-#define isIOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
 #define CSIOS7UIImageRenderingModeAlwaysTemplate 2
 
 @implementation TKCalendarMonthViewHeader
@@ -166,9 +165,7 @@
 }
 
 - (void) setAccessoryViewColor:(UIColor *)color {
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
-        [accessoryView setValue:color forKeyPath:@"tintColor"];
-    }
+    [accessoryView setTintColor:color];
 }
 
 @end

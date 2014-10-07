@@ -35,8 +35,6 @@
 #import "NSDate+TKCategory.h"
 #import <objc/message.h>
 
-#define isIOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
-
 @interface NSArray(TKCalendarExtensions)
 - (BOOL) isMarkAtIndex:(NSUInteger) index;
 @end
@@ -209,18 +207,8 @@
 - (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray*)markArray startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone
 {
     if ((self = [super initWithFrame:frame])) {
-        UIImage *gradientImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient.png")];
-        UIImage *grayGradientImage = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/color_gradient_gray.png")];
-        UIImage *gradientImageStreched = [gradientImage stretchableImageWithLeftCapWidth:gradientImage.size.width
-                                                                            topCapHeight:floorf(gradientImage.size.height/2)];
-        UIImage *grayGradientImageStreched = [grayGradientImage stretchableImageWithLeftCapWidth:grayGradientImage.size.width
-                                                                                    topCapHeight:floorf(grayGradientImage.size.height/2)];
-        gradientColor = [UIColor colorWithPatternImage:gradientImageStreched];
-		grayGradientColor = [UIColor colorWithPatternImage:grayGradientImageStreched];
-        if (isIOS7) {
-            gradientColor = [UIColor whiteColor];
-            grayGradientColor = [UIColor whiteColor];
-        }
+        gradientColor = [UIColor whiteColor];
+        grayGradientColor = [UIColor whiteColor];
         
         self.contentMode = UIViewContentModeRedraw;
         self.timeZone = timeZone;
@@ -278,9 +266,7 @@
     [super layoutSubviews];
     
     selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
-    if (isIOS7) {
-        selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected size:selectedImageView.frame.size];
-    }
+    selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected size:selectedImageView.frame.size];
     BOOL hasDot = [[marks objectAtIndex: selectedBox.row * 7 + selectedBox.section] boolValue];
 	self.selectedImageView.dot.hidden = !hasDot;
 }
@@ -300,9 +286,6 @@
 		NSInteger index = today +  pre-1;
 		CGRect r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
 		r.origin.y += 0.0f;
-        if (!isIOS7) {
-            [[TKTile imageForTileType:TKTileTypeToday size:CGSizeMake(self.tileWidth, tileHeight)] drawInRect:r];
-        }
 	}
 	
     CGFloat myColorValues[] = {1, 1, 1, .8};
@@ -328,19 +311,7 @@
 	[color set];
 	for(NSInteger i=1; i <= daysInMonth; i++){
 		r = [self rectForCellAtIndex:index tileWidth:self.tileWidth tileHeight:tileHeight];
-		if(today == i) {
-            if (!isIOS7) {
-                CGContextSetShadowWithColor(context, CGSizeMake(0,-1), 0, darkColor);
-                [[UIColor whiteColor] set];
-            }
-        }
 		[TKTile drawTileInRect:r day:i mark:[marks isMarkAtIndex:index] font:dateFont font2:dotFont context:context isToday:today == i isOtherMonthDay:NO];
-		if(today == i){
-            if (!isIOS7) {
-                CGContextSetShadowWithColor(context, CGSizeMake(0,1), 0, whiteColor);
-                [color set];
-            }
-		}
 		index++;
 	}
 	

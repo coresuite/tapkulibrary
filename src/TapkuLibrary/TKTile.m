@@ -13,7 +13,6 @@
 //#define dotFontSize 18.0
 //#define dateFontSize 22.0
 
-#define isIOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
 #define IS_WIDESCREEN (fabs((double)[[UIScreen mainScreen] bounds].size.height - (double)568) < DBL_EPSILON)
 
 static NSString * const separatorColorKey = @"sepColor";
@@ -22,22 +21,18 @@ static NSString * const selectionBgColor = @"bgColor";
 static NSString * const dotStirng = @"•";
 static NSMutableDictionary *appearanceInfo = nil;
 static void correctYofLabelForIOS7(CGRect *dayRect, BOOL invert) {
-    if (isIOS7) {
-        if (invert) {
-            dayRect->origin.y = dayRect->origin.y + 4.0f;
-        } else {
-            dayRect->origin.y = dayRect->origin.y - 4.0f;
-        }
+    if (invert) {
+        dayRect->origin.y = dayRect->origin.y + 4.0f;
+    } else {
+        dayRect->origin.y = dayRect->origin.y - 4.0f;
     }
 }
 
 static void correctYofDotForIOS7(CGRect *dotRect, BOOL invert) {
-    if (isIOS7) {
-        if (invert) {
-            dotRect->origin.y = dotRect->origin.y - 4.0f;
-        } else {
-            dotRect->origin.y = dotRect->origin.y + 4.0f;
-        }
+    if (invert) {
+        dotRect->origin.y = dotRect->origin.y - 4.0f;
+    } else {
+        dotRect->origin.y = dotRect->origin.y + 4.0f;
     }
 }
 
@@ -86,9 +81,6 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 		dot.textAlignment = UITextAlignmentCenter;
 //		dot.shadowColor = [UIColor darkGrayColor];
 //		dot.shadowOffset = CGSizeMake(0, -1);
-        if (!isIOS7) {
-            [self addSubview:dot];
-        }
         
         if (appearanceInfo == nil) {
             appearanceInfo = [[NSMutableDictionary alloc] init];
@@ -129,43 +121,37 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 + (void) drawTileInRect:(CGRect)tileRect day:(NSInteger)day mark:(BOOL)mark font:(UIFont*)f1 font2:(UIFont*)f2 context:(CGContextRef)context
                 isToday:(BOOL) isToday isOtherMonthDay:(BOOL)isOtherMonthDay
 {
-	NSString *str = [TKTile stringFromDayNumber:day];
-	
-	CGRect r = [TKTile rectForLabelForTileRect:tileRect labelFont:f1];
-	
+    NSString *str = [TKTile stringFromDayNumber:day];
+    
+    CGRect r = [TKTile rectForLabelForTileRect:tileRect labelFont:f1];
+    
     CGFloat heightCorrection = -2;
     if (r.size.height >= 27.0f) {
         heightCorrection = 4;
     }
-    if (!isIOS7) {
-        CGContextSetPatternPhase(context, CGSizeMake(r.origin.x, r.origin.y + heightCorrection));
-    } else {
-        TKTileType type = TKTileTypeNotSelected;
-        
-        if (isToday) {
-            type = TKTileTypeToday;
-        } else if (isOtherMonthDay) {
-            type = TKTileTypeDarken;
-        }
-        UIColor *fillColor = [appearanceInfo objectForKey:[NSString stringWithFormat:@"%d", type]];
-        CGContextSetFillColorWithColor(context, fillColor.CGColor);
+    TKTileType type = TKTileTypeNotSelected;
+    
+    if (isToday) {
+        type = TKTileTypeToday;
+    } else if (isOtherMonthDay) {
+        type = TKTileTypeDarken;
     }
+    UIColor *fillColor = [appearanceInfo objectForKey:[NSString stringWithFormat:@"%d", type]];
+    CGContextSetFillColorWithColor(context, fillColor.CGColor);
     
     correctYofLabelForIOS7(&r, NO);
-	[str drawInRect: r
-		   withFont: f1
-	  lineBreakMode: UILineBreakModeWordWrap 
-		  alignment: UITextAlignmentCenter];
+    [str drawInRect: r
+           withFont: f1
+      lineBreakMode: UILineBreakModeWordWrap
+          alignment: UITextAlignmentCenter];
     correctYofLabelForIOS7(&r, YES);
 	
 	if(mark){
 		convertDateLabelRectToDotRect(&r, f2, dotStirng);
 		correctYofDotForIOS7(&r, NO);
         
-        if (isIOS7) {
-            UIColor *dot = [appearanceInfo objectForKey:dotColor];
-            CGContextSetFillColorWithColor(context, dot.CGColor);
-        }
+        UIColor *dot = [appearanceInfo objectForKey:dotColor];
+        CGContextSetFillColorWithColor(context, dot.CGColor);
         
 		[dotStirng drawInRect:r
 				withFont: f2
@@ -221,24 +207,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 }
 
 + (UIImage *) imageForTileType:(TKTileType) tileType size:(CGSize) size {
-    if (isIOS7) {
-        return [TKTile iOS7imageForTileType:tileType size:size];
-    }
-    
-	UIImage *imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/dateTile.png")]; // not selected
-	if (tileType == TKTileTypeSelected) {
-        NSString *path = TKBUNDLE(@"calendar/dateTileSelected.png");
-        imageToReturn = [[UIImage imageWithContentsOfFile:path] stretchableImageWithLeftCapWidth:1 topCapHeight:0];
-	} else if (tileType == TKTileTypeSelectedToday) {
-		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/todayselected.png")];
-	} else if (tileType == TKTileTypeDarken) {
-		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/Month Calendar Date Tile Gray.png")];
-	} else if(tileType == TKTileTypeToday) {
-		imageToReturn = [UIImage imageWithContentsOfFile:TKBUNDLE(@"calendar/today.png")];
-	}
-
-
-	return imageToReturn;
+    return [TKTile iOS7imageForTileType:tileType size:size];
 }
 
 #pragma mark -
