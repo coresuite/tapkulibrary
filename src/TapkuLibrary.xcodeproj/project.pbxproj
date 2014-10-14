@@ -932,7 +932,6 @@
 				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = TapkuLibrary;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -955,7 +954,6 @@
 				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = TapkuLibrary;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -976,6 +974,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
 				WARNING_CFLAGS = "-Wno-arc-performSelector-leaks";
 			};
 			name = Debug;
@@ -992,6 +991,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
 				WARNING_CFLAGS = "-Wno-arc-performSelector-leaks";
 			};
 			name = Release;
@@ -1014,7 +1014,6 @@
 				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = TapkuCore;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1037,7 +1036,6 @@
 				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = TapkuCore;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1064,7 +1062,6 @@
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = "./**";
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = MonthCalendar;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
