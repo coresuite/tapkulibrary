@@ -60,7 +60,7 @@
 - (NSDate*) lastOfMonthDateWithTimeZone:(NSTimeZone*)timeZone{
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	gregorian.timeZone = timeZone;
-	NSDateComponents *comp = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit) fromDate:self];
+	NSDateComponents *comp = [gregorian components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:self];
 	comp.timeZone = timeZone;
 	[comp setDay:0];
 	[comp setMonth:comp.month+1];
@@ -71,7 +71,7 @@
 + (NSDate*) lastofMonthDateWithTimeZone:(NSTimeZone*)timeZone{
     NSDate *day = [NSDate date];
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	NSDateComponents *comp = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit) fromDate:day];
+	NSDateComponents *comp = [gregorian components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:day];
 	[comp setDay:0];
 	[comp setMonth:comp.month+1];
 	return [gregorian dateFromComponents:comp];
@@ -79,7 +79,7 @@
 + (NSDate*) lastOfCurrentMonthWithTimeZone:(NSTimeZone*)timeZone{
 	NSDate *day = [NSDate date];
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-	NSDateComponents *comp = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit) fromDate:day];
+	NSDateComponents *comp = [gregorian components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:day];
 	[comp setDay:0];
 	[comp setMonth:comp.month+1];
 	return [gregorian dateFromComponents:comp];
