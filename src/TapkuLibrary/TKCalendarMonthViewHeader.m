@@ -52,7 +52,7 @@
 
 #pragma mark -
 
-- (id)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
 		// bg
@@ -160,7 +160,7 @@
 }
 
 - (void) setTitleFontAttributes:(NSDictionary *)titleAttributes {
-    UIFont *fontName = [titleAttributes objectForKey:NSFontAttributeName];
+    UIFont *fontName = titleAttributes[NSFontAttributeName];
     titleView.font = fontName;
 }
 

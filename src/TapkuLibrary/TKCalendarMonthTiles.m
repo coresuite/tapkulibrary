@@ -204,7 +204,7 @@
     return rows;
 }
 
-- (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray*)markArray startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone
+- (instancetype) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray*)markArray startOnSunday:(BOOL)sunday timeZone:(NSTimeZone*)timeZone
 {
     if ((self = [super initWithFrame:frame])) {
         gradientColor = [UIColor whiteColor];
@@ -267,7 +267,7 @@
     
     selectedImageView.frame = [self rectForTileAtIndexPath:selectedBox];
     selectedImageView.image = [TKTile imageForTileType:TKTileTypeSelected size:selectedImageView.frame.size];
-    BOOL hasDot = [[marks objectAtIndex: selectedBox.row * 7 + selectedBox.section] boolValue];
+    BOOL hasDot = [marks[selectedBox.row * 7 + selectedBox.section] boolValue];
 	self.selectedImageView.dot.hidden = !hasDot;
 }
 
@@ -353,7 +353,7 @@
         [self addSubview:self.selectedImageView];
     }
 	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:day];
-    BOOL hasDot = [[marks objectAtIndex: row * 7 + column ] boolValue];
+    BOOL hasDot = [marks[row * 7 + column] boolValue];
 	self.selectedImageView.dot.hidden = !hasDot;
     
     if(column < 0){
@@ -422,7 +422,7 @@
         [self addSubview:self.selectedImageView];
     }
 	self.selectedImageView.currentDay.text = [TKTile stringFromDayNumber:day];
-	self.selectedImageView.dot.hidden = ![[marks objectAtIndex: row * 7 + column] boolValue];
+	self.selectedImageView.dot.hidden = ![marks[row * 7 + column] boolValue];
 	
     selectedBox = [NSIndexPath indexPathForRow:row inSection:column];
     [self setNeedsLayout];

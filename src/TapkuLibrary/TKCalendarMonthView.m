@@ -74,23 +74,23 @@
 	return CGRectGetHeight(header.bounds) + CGRectGetHeight(currentTile.selectedImageView.bounds) * 6;
 }
 
-- (id) init {
+- (instancetype) init {
 	return [self initWithSundayAsFirst:[NSDate sundayShouldBeFirst]];
 }
 
-- (id) initWithFrame:(CGRect)aFrame {
+- (instancetype) initWithFrame:(CGRect)aFrame {
 	return [self initWithFrame:aFrame sundayAsFirst:[NSDate sundayShouldBeFirst]];
 }
 
-- (id) initWithSundayAsFirst:(BOOL)sunday {
+- (instancetype) initWithSundayAsFirst:(BOOL)sunday {
 	return [self initWithFrame:CGRectZero sundayAsFirst:[NSDate sundayShouldBeFirst]];
 }
 
-- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s {
+- (instancetype) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s {
     return [self initWithFrame:aFrame sundayAsFirst:s timeZone:[NSTimeZone defaultTimeZone]];
 }
 
-- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz {
+- (instancetype) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz {
     if ((self = [super initWithFrame:aFrame])) {
         self.timeZone = tz;
         sunday = s;
@@ -117,7 +117,7 @@
         NSArray *ar = [NSDate dayDescriptionsStartingOnSunday:sunday];
         NSInteger i = 0;
         for(NSString *s in ar){
-            UILabel *dayLabel = [self.header.dayLabels objectAtIndex:i];
+            UILabel *dayLabel = (self.header.dayLabels)[i];
             dayLabel.text = s;
             ++i;
         }
@@ -135,7 +135,7 @@
 	NSDate *localNextMonth = [NSDate dateWithDateComponents:nextInfo];
     
 	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:nextMonth startOnSunday:sunday timeZone:self.timeZone];
-	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
+	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:dates[0] toDate:[dates lastObject]];
     
     CGRect rect = [currentTile frame];
     rect.size.height = [TKCalendarMonthView effectiveTilesHeightForMonth:nextMonth timeZone:self.timeZone availableRect:self.bounds];
@@ -144,7 +144,7 @@
 	
 	int overlap =  0;
 	if(isNext){
-		overlap = [newTile.monthDate isEqualToDate:[dates objectAtIndex:0]] ? 0 : [TKCalendarMonthView headerHeight];
+		overlap = [newTile.monthDate isEqualToDate:dates[0]] ? 0 : [TKCalendarMonthView headerHeight];
 	} else {
 		overlap = [currentTile.monthDate compare:[dates lastObject]] !=  NSOrderedDescending ? [TKCalendarMonthView headerHeight] : 0;
 	}
@@ -253,7 +253,7 @@
         }
         
 		NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:month startOnSunday:sunday timeZone:self.timeZone];
-		NSArray *data = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
+		NSArray *data = [dataSource calendarMonthView:self marksFromDate:dates[0] toDate:[dates lastObject]];
         
         CGRect rect = [currentTile frame];
         rect.size.height = [TKCalendarMonthView effectiveTilesHeightForMonth:month timeZone:self.timeZone availableRect:self.bounds];
@@ -286,7 +286,7 @@
 
 - (void) reload {
 	NSArray *dates = [TKCalendarMonthTiles rangeOfDatesInMonthGrid:[currentTile monthDate] startOnSunday:sunday timeZone:self.timeZone];
-	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:[dates objectAtIndex:0] toDate:[dates lastObject]];
+	NSArray *ar = [dataSource calendarMonthView:self marksFromDate:dates[0] toDate:[dates lastObject]];
 	
     [currentTile setMarks:ar];
 }
@@ -313,7 +313,7 @@
         
 		[self changeMonthAnimation:b];
 		
-		NSInteger day = [[ar objectAtIndex:0] intValue];
+		NSInteger day = [ar[0] intValue];
         NSDateComponents *info = [[currentTile monthDate] dateComponentsWithTimeZone:self.timeZone];
 		info.day = day;
         NSDate *dateForMonth = [NSDate dateWithDateComponents:info];

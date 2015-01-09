@@ -61,7 +61,7 @@
 @property (nonatomic, strong) NSTimeZone *timeZone;
 @property (nonatomic, strong) NSArray *marks;
 
-- (id) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray *)markArray startOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone;
+- (instancetype) initWithFrame:(CGRect)frame month:(NSDate *)date marks:(NSArray *)markArray startOnSunday:(BOOL) sunday timeZone:(NSTimeZone*)timeZone NS_DESIGNATED_INITIALIZER;
 - (void) setTarget:(id)target action:(SEL)action;
 
 - (BOOL) selectDay:(NSInteger)day;

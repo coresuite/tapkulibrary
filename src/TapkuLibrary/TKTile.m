@@ -60,7 +60,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 	return currentDay.shadowOffset;
 }
 
-- (id) initWithFrame:(CGRect)frame {
+- (instancetype) initWithFrame:(CGRect)frame {
 	if ((self = [super initWithFrame:frame])) {
 		// day label
 		currentDay = [[UILabel alloc] initWithFrame:self.bounds];
@@ -136,7 +136,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     } else if (isOtherMonthDay) {
         type = TKTileTypeDarken;
     }
-    UIColor *fillColor = [appearanceInfo objectForKey:[NSString stringWithFormat:@"%d", type]];
+    UIColor *fillColor = appearanceInfo[[NSString stringWithFormat:@"%ld", type]];
     CGContextSetFillColorWithColor(context, fillColor.CGColor);
     
     correctYofLabelForIOS7(&r, NO);
@@ -150,7 +150,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 		convertDateLabelRectToDotRect(&r, f2, dotStirng);
 		correctYofDotForIOS7(&r, NO);
         
-        UIColor *dot = [appearanceInfo objectForKey:dotColor];
+        UIColor *dot = appearanceInfo[dotColor];
         CGContextSetFillColorWithColor(context, dot.CGColor);
         
 		[dotStirng drawInRect:r
@@ -238,7 +238,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 #pragma mark - Appearance
 
 - (void) setDotColor:(UIColor *)color {
-    [appearanceInfo setObject:color forKey:dotColor];
+    appearanceInfo[dotColor] = color;
 }
 
 - (void) setSelectionBgColor:(UIColor *)bgColor {
@@ -246,11 +246,11 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 }
 
 - (void) setDayLabelTextColor:(UIColor *)textColor forTileType:(TKTileType)tileType  {
-    [appearanceInfo setValue:textColor forKey:[NSString stringWithFormat:@"%d", tileType]];
+    [appearanceInfo setValue:textColor forKey:[NSString stringWithFormat:@"%ld", tileType]];
 }
 
 - (void) setSeparatorColor:(UIColor *) sepColor {
-    [appearanceInfo setObject:sepColor forKey:separatorColorKey];
+    appearanceInfo[separatorColorKey] = sepColor;
 }
 
 #pragma mark - iOS7 image generation
@@ -267,12 +267,12 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     if (!selectionDrawn) {
         CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
         CGContextFillRect(context, CGRectMake(0.0f, 0.0f, tileWidth, tileHeight));
-        UIColor *separatorColor = [appearanceInfo objectForKey:separatorColorKey];
+        UIColor *separatorColor = appearanceInfo[separatorColorKey];
         CGContextSetStrokeColorWithColor(context,  separatorColor.CGColor);
         CGContextStrokeRectWithWidth(context, CGRectMake(0.0f, tileHeight, tileWidth, 1.0f), 1.0f);
     }
     if (selectionDrawn) {
-        UIColor *bgColor = [appearanceInfo objectForKey:selectionBgColor];
+        UIColor *bgColor = appearanceInfo[selectionBgColor];
         CGContextSetFillColorWithColor(context, bgColor.CGColor);
         CGFloat selectionWidth = floorf(tileWidth / 1.54f); // adjusted propotionally to the size of the tile (iPhone/iPad)
         CGFloat yOffset = floorf(tileWidth / 21.0f);        // adjusted propotionally to the size of the tile (iPhone/iPad)

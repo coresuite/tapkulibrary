@@ -8,13 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-typedef enum {
+typedef NS_ENUM(NSInteger, TKTileType) {
 	TKTileTypeNotSelected = 0,
 	TKTileTypeSelected,
 	TKTileTypeSelectedToday,
 	TKTileTypeToday,
 	TKTileTypeDarken
-} TKTileType;
+} ;
 
 @interface TKTile : UIImageView<UIAppearance> {
 	UILabel *dot;

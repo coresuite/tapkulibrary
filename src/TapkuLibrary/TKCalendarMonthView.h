@@ -53,9 +53,9 @@
 @property (nonatomic,weak) id <TKCalendarMonthViewDataSource> dataSource;
 @property (nonatomic,weak) id <TKCalendarMonthViewSizeDelegate> sizeDelegate;
 
-- (id) initWithSundayAsFirst:(BOOL)sunday; // it sunday regardless right now...
-- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s;
-- (id) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz;
+- (instancetype) initWithSundayAsFirst:(BOOL)sunday; // it sunday regardless right now...
+- (instancetype) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s;
+- (instancetype) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz NS_DESIGNATED_INITIALIZER;
 
 - (NSDate*) dateSelected;
 - (NSDate*) monthDate;
