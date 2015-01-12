@@ -136,7 +136,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     } else if (isOtherMonthDay) {
         type = TKTileTypeDarken;
     }
-    UIColor *fillColor = appearanceInfo[[NSString stringWithFormat:@"%ld", type]];
+    UIColor *fillColor = appearanceInfo[[NSString stringWithFormat:@"%ld", (long)type]];
     CGContextSetFillColorWithColor(context, fillColor.CGColor);
     
     correctYofLabelForIOS7(&r, NO);
@@ -246,7 +246,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 }
 
 - (void) setDayLabelTextColor:(UIColor *)textColor forTileType:(TKTileType)tileType  {
-    [appearanceInfo setValue:textColor forKey:[NSString stringWithFormat:@"%ld", tileType]];
+    [appearanceInfo setValue:textColor forKey:[NSString stringWithFormat:@"%ld", (long)tileType]];
 }
 
 - (void) setSeparatorColor:(UIColor *) sepColor {
