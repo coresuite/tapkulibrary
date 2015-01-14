@@ -68,7 +68,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 		currentDay.textColor = [UIColor whiteColor];
 		currentDay.backgroundColor = [UIColor clearColor];
 		currentDay.font = [TKTile fontForDateLabelForTileRect:frame];
-		currentDay.textAlignment = UITextAlignmentCenter;
+		currentDay.textAlignment = NSTextAlignmentCenter;
 //		currentDay.shadowColor = [UIColor darkGrayColor];
 //		currentDay.shadowOffset = CGSizeMake(0, -1);
 		[self addSubview:currentDay];
@@ -78,7 +78,7 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
 		dot.textColor = [UIColor whiteColor];
 		dot.backgroundColor = [UIColor clearColor];
 		dot.font = [TKTile fontForDotLabelForTileRect:frame];
-		dot.textAlignment = UITextAlignmentCenter;
+		dot.textAlignment = NSTextAlignmentCenter;
 //		dot.shadowColor = [UIColor darkGrayColor];
 //		dot.shadowOffset = CGSizeMake(0, -1);
         
@@ -140,10 +140,16 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
     CGContextSetFillColorWithColor(context, fillColor.CGColor);
     
     correctYofLabelForIOS7(&r, NO);
-    [str drawInRect: r
-           withFont: f1
-      lineBreakMode: UILineBreakModeWordWrap
-          alignment: UITextAlignmentCenter];
+    
+    NSMutableParagraphStyle *textStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+    textStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    textStyle.alignment = NSTextAlignmentCenter;
+    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                f1, NSFontAttributeName,
+                                fillColor, NSForegroundColorAttributeName,
+                                textStyle, NSParagraphStyleAttributeName,
+                                nil];
+    [str drawInRect:r withAttributes:attributes];
     correctYofLabelForIOS7(&r, YES);
 	
 	if(mark){
@@ -153,10 +159,16 @@ static void convertDateLabelRectToDotRect(CGRect *dateLabelRect, UIFont *dotFont
         UIColor *dot = appearanceInfo[dotColor];
         CGContextSetFillColorWithColor(context, dot.CGColor);
         
-		[dotStirng drawInRect:r
-				withFont: f2
-		   lineBreakMode: UILineBreakModeWordWrap 
-			   alignment: UITextAlignmentCenter];
+        NSMutableParagraphStyle *textStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+        textStyle.lineBreakMode = NSLineBreakByWordWrapping;
+        textStyle.alignment = NSTextAlignmentCenter;
+        NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    f2, NSFontAttributeName,
+                                    dot, NSForegroundColorAttributeName,
+                                    textStyle, NSParagraphStyleAttributeName,
+                                    nil];
+        
+        [dotStirng drawInRect:r withAttributes:attributes];
 	}
 }
 

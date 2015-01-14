@@ -75,7 +75,7 @@
 		
 		// title
 		titleView = [[UILabel alloc] initWithFrame:CGRectZero];
-		titleView.textAlignment = UITextAlignmentCenter;
+		titleView.textAlignment = NSTextAlignmentCenter;
 		titleView.backgroundColor = [UIColor clearColor];
 		titleView.font = [UIFont boldSystemFontOfSize:22];
 		titleView.textColor = titleColor;
@@ -85,7 +85,7 @@
 		// day labels
 		for(NSInteger i = 0; i < 7; ++i){
 			UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
-			label.textAlignment = UITextAlignmentCenter;
+			label.textAlignment = NSTextAlignmentCenter;
 			label.shadowColor = [UIColor whiteColor];
 			label.shadowOffset = CGSizeMake(0, 1);
 			label.font = [UIFont systemFontOfSize:10];
@@ -116,8 +116,19 @@
 	rightArrow.frame = CGRectMake(CGRectGetWidth(self.bounds) - arrowsY, 0, arrowsY, fCalendarHeaderComponentsHeight);
 	
 	titleView.frame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), fCalendarHeaderComponentsHeight);
-    
-    CGSize titleViewStringSize = [titleView.text sizeWithFont:titleView.font];
+
+    BOOL multiline = YES;
+    NSStringDrawingContext *context = [[NSStringDrawingContext alloc] init];
+    context.minimumScaleFactor = 0.4;
+    NSDictionary *attributes = nil;
+    if (titleView.font != nil) {
+        attributes = @{NSFontAttributeName: titleView.font};
+    }
+    NSStringDrawingOptions options = NSStringDrawingTruncatesLastVisibleLine;
+    if (multiline) {
+        options = NSStringDrawingUsesLineFragmentOrigin;
+    }
+    CGSize titleViewStringSize = CGRectIntegral([titleView.text boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:options attributes:attributes context:context]).size;
     CGRect accessoryViewFrame = accessoryView.frame;
     accessoryViewFrame.origin.x = (self.bounds.size.width / 2.0f); // place the accessory into the middle of the header
     accessoryViewFrame.origin.x += roundf((titleViewStringSize.width / 2.0f)); // move it to the right, exactly half the size of the string space
