@@ -434,9 +434,9 @@
 		selectedPortion = portion;
         objc_msgSend(target, action, @[@(day)]);
 
-	} else if(down){
+    } else if(down){
+        selectedPortion = portion;
         objc_msgSend(target, action, @[@(day),@(portion)]);
-		selectedPortion = portion;
 	}
 }
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
