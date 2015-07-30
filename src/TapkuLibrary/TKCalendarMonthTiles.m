@@ -432,11 +432,14 @@
 	selectedDay = day;
 	if (portion == 1){
 		selectedPortion = portion;
-        objc_msgSend(target, action, @[@(day)]);
-
+        if ([target respondsToSelector:action]) {
+            [target performSelector:action withObject:@[@(day)]];
+        }
     } else if(down){
         selectedPortion = portion;
-        objc_msgSend(target, action, @[@(day),@(portion)]);
+        if ([target respondsToSelector:action]) {
+            [target performSelector:action withObject:@[@(day),@(portion)]];
+        }
 	}
 }
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
