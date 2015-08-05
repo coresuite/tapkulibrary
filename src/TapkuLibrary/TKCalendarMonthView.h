@@ -55,7 +55,7 @@
 
 - (instancetype) initWithSundayAsFirst:(BOOL)sunday; // it sunday regardless right now...
 - (instancetype) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s;
-- (instancetype) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz NS_DESIGNATED_INITIALIZER;
+- (instancetype) initWithFrame:(CGRect) aFrame sundayAsFirst:(BOOL) s timeZone:(NSTimeZone*)tz;
 
 - (NSDate*) dateSelected;
 - (NSDate*) monthDate;
