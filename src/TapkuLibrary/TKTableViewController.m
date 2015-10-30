@@ -128,10 +128,10 @@
 	_searchBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	return _searchBar;
 }
-- (UISearchDisplayController*) searchBarDisplayController{
+- (CSSearchDisplayController*) searchBarDisplayController{
 	if(_searchBarDisplayController) return _searchBarDisplayController;
 		
-	_searchBarDisplayController = [[UISearchDisplayController alloc] initWithSearchBar:self.searchBar contentsController:self];
+	_searchBarDisplayController = [[CSSearchDisplayController alloc] initWithSearchBar:self.searchBar contentsController:self];
 	_searchBarDisplayController.delegate = self;
 	_searchBarDisplayController.searchResultsDataSource = self;
 	_searchBarDisplayController.searchResultsDelegate = self;

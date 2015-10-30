@@ -67,8 +67,8 @@
 /** Returns a `UISearchBar` view. */
 @property (nonatomic,strong) UISearchBar *searchBar;
 
-/** Returns a `UISearchDisplayController` for the search bar and table view. */
-@property (nonatomic,strong) UISearchDisplayController *searchBarDisplayController;
+/** Returns a `CSSearchDisplayController` for the search bar and table view. */
+@property (nonatomic,strong) CSSearchDisplayController *searchBarDisplayController;
 
 /** The default value of this property is YES. When YES, the table view controller clears the table’s current selection when it receives a viewWillAppear: message. Setting this property to NO preserves the selection. */
 @property (nonatomic,assign) BOOL clearsSelectionOnViewWillAppear;
